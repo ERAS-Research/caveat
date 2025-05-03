@@ -21,14 +21,32 @@ async def trxpc1_core_interface(dut):
     #indicate ready to receive outputs to core AXIS
     dut.m_axis_sys_tready.value = int(1)
 
-    # run for 50ns checking count on each rising edge
-    for cnt in range(5):
+    # run for 1000 cycles, checking for data on each rising edge
+    data_buffer = []
+    current_packet = []
+    n_sample = 0
+    n_sample_max = 5
+    for cnt in range(1000):
         await RisingEdge(dut.clk)
-        #place data on RF-Rx sampling port
-        dut.s_axis_rfrx_tvalid.value = int(1)
-        print(int(1564815 + cnt*100).to_bytes(5, 'big'))
-        dut.s_axis_rfrx_tdata.value = int(1564815)# + cnt*100).to_bytes(5, 'big')
+        #place up to three data samples on RF-Rx sampling port
+        #..first transfer
+        # OR
+        #..transfer complete, place new sample
+        if cnt == 0:
+            dut.s_axis_rfrx_tvalid.value = int(1)
+            dut.s_axis_rfrx_tdata.value = int(100)
+        elif (dut.s_axis_rfrx_tready.value) and (dut.s_axis_rfrx_tvalid.value) and (n_sample < n_sample_max):
+            n_sample = n_sample + 1
+            dut.s_axis_rfrx_tvalid.value = int(1)
+            dut.s_axis_rfrx_tdata.value = int(100 + n_sample)
+        elif (dut.s_axis_rfrx_tready.value) and (dut.s_axis_rfrx_tvalid.value) and (n_sample >= n_sample_max):
+            dut.s_axis_rfrx_tvalid.value = int(0)
 
-        axis_out = zip(dut.m_axis_sys_tdata.value, dut.m_axis_sys_tvalid.value, dut.m_axis_sys_tlast.value)
+        if (dut.m_axis_sys_tvalid.value):
+            current_packet.append(int(dut.m_axis_sys_tdata.value))
+            if (dut.m_axis_sys_tlast.value):
+                data_buffer.append(current_packet)
+                current_packet = []
 
-        print(cnt, axis_out)
+    for ii, pkg in enumerate(data_buffer):
+        print('Pkg#', ii, 'data:', pkg)
