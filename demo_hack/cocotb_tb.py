@@ -1,7 +1,6 @@
 # Copyright (C) 2025 ERAS Research Group and sanimut Development Team
 # Author(s): Torsten Reuschel
 
-# Simple tests for an counter module
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
