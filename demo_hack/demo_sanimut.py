@@ -164,7 +164,7 @@ async def trxpc1_core_interface(dut):
 
 
     #indicate ready to receive outputs to core AXIS
-    dut.m_axis_sys_tready.value = int(1)
+    dut.m_axis_udp_tready.value = int(1)
 
     # run for 1000 cycles, checking for data on each rising edge
     data_buffer = []
@@ -174,7 +174,7 @@ async def trxpc1_core_interface(dut):
     # for cnt in range(1000):
     while not params['stop']:
         #timeout to reduce CPU load
-        time.sleep(.001) #FIXME: magic number, slows down emulator processing speed
+        # time.sleep(.001) #FIXME: magic number, slows down emulator processing speed
 
         await RisingEdge(dut.clk)
         # #place up to three data samples on RF-Rx sampling port
@@ -204,24 +204,25 @@ async def trxpc1_core_interface(dut):
 
         #AXI input to device
         #..transfer complete
-        if (dut.s_axis_sys_tready.value) and (dut.s_axis_sys_tvalid.value):
-            dut.s_axis_sys_tvalid.value = int(0)
-            dut.s_axis_sys_tlast.value = int(0)
+        if (dut.s_axis_udp_tready.value) and (dut.s_axis_udp_tvalid.value):
+            dut.s_axis_udp_tvalid.value = int(0)
+            dut.s_axis_udp_tlast.value = int(0)
         #..place new data on interface
         if (message \
-        and (dut.s_axis_sys_tready.value or (dut.s_axis_sys_tvalid.value == 0))):
-            dut.s_axis_sys_tdata.value = message[0]
+        and (dut.s_axis_udp_tready.value or (dut.s_axis_udp_tvalid.value == 0))):
+            dut.s_axis_udp_tdata.value = message[0]
             print(message[0], end='..')
-            dut.s_axis_sys_tvalid.value = int(1)
+            dut.s_axis_udp_tvalid.value = int(1)
             message = message[1:]
             if not message:
-                dut.s_axis_sys_tlast.value = int(1)
+                dut.s_axis_udp_tlast.value = int(1)
                 print('(done)')
 
-        #receive UDP output from device and forward to interface
-        if (dut.m_axis_sys_tvalid.value):
-            current_packet.append(int(dut.m_axis_sys_tdata.value))
-            if (dut.m_axis_sys_tlast.value):
+        #receive UDP output from device and forward to interface (always ready to receive)
+        dut.m_axis_udp_tready.value = int(1)
+        if (dut.m_axis_udp_tvalid.value):
+            current_packet.append(int(dut.m_axis_udp_tdata.value))
+            if (dut.m_axis_udp_tlast.value):
                 data_buffer.append(current_packet)
                 current_packet = []
         for pkg in data_buffer:
