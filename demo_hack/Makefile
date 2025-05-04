@@ -2,10 +2,11 @@
 # Author(s): Torsten Reuschel
 
 all:
-	iverilog -o trxpc1_core -c source_files.list -I ${SANIMUT_FPGA_SOURCEDIR}
+	@mkdir -p build
+	iverilog -o build/trxpc1_core -c source_files.list -I ${SANIMUT_FPGA_SOURCEDIR}
 
 clean:
-	@rm -f trxpc1_core
+	@rm -rf build
 	@rm -f results.xml
 	@rm -rf sim_build
 	@rm -rf __pycache__
