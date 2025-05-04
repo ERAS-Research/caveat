@@ -8,10 +8,7 @@ TOPLEVEL_LANG ?= verilog
 COCOTB_HDL_TIMEUNIT = 1ns
 COCOTB_HDL_TIMEPRECISION = 1ps
 
-#print work directory for development/debugging purposes
-$(info SANIMUTROOT=$(SANIMUTROOT))
-$(info SANIMUT_FPGA_SOURCEDIR=$(SANIMUT_FPGA_SOURCEDIR))
-
+#include sources
 VERILOG_SOURCES += $(SANIMUT_FPGA_SOURCEDIR)/trxpc1_core.v
 VERILOG_SOURCES += def_sanimut_deployment_configuration.vh
 
