@@ -44,30 +44,11 @@ class SocketInterface(object):
       self.host_port = host_port
       self.comms_init_func()
 
-    def forward_packet_socket_to_emulator(self, timeout=0.01):
-        """Process UDP packet and update propertygrid
-        """
-        comm_status = -1
-
-        while not params['stop']:
-            #timeout to reduce CPU load
-            time.sleep(timeout)
-
-            try:
-                recv_message = params['queues']['recv_queue'].get_nowait()
-                print('recv_message:', recv_message)
-            except queue.Empty:
-                continue
-
-            #found packet in queue
-            # if (recv_message[0:3] == COMM_PACKET['SYS_ETH_CONF_BROADCAST']):
-                # comm_status = 0
-
     def forward_packet_emulator_to_socket(self, message=None):
         """Place packet/payload on sending queue
         """
         if message:
-            print('forward_packet_emulator_to_socket', message)
+            print('DEV>SOCK', message)
             params['queues']['send_queue'].put(message)
 
 
@@ -172,6 +153,7 @@ class SocketInterface(object):
 
 @cocotb.test()
 async def trxpc1_core_interface(dut):
+    message = None
     #FIXME: add signal_handler
 
     #create socket interface
@@ -190,33 +172,51 @@ async def trxpc1_core_interface(dut):
     n_sample = 0
     n_sample_max = 5
     # for cnt in range(1000):
-    while (True):
+    while not params['stop']:
         #timeout to reduce CPU load
         time.sleep(.001) #FIXME: magic number, slows down emulator processing speed
 
         await RisingEdge(dut.clk)
-        #place up to three data samples on RF-Rx sampling port
-        #..first transfer
-        # OR
-        #..transfer complete, place new sample
-        if n_sample == 0:
-            n_sample = n_sample + 1
-            dut.s_axis_rfrx_tvalid.value = int(1)
-            dut.s_axis_rfrx_tdata.value = int(100)
-        elif (dut.s_axis_rfrx_tready.value) and (dut.s_axis_rfrx_tvalid.value) and (n_sample < n_sample_max):
-            n_sample = n_sample + 1
-            dut.s_axis_rfrx_tvalid.value = int(1)
-            dut.s_axis_rfrx_tdata.value = int(100 + n_sample)
-        elif (dut.s_axis_rfrx_tready.value) and (dut.s_axis_rfrx_tvalid.value) and (n_sample >= n_sample_max):
-            dut.s_axis_rfrx_tvalid.value = int(0)
+        # #place up to three data samples on RF-Rx sampling port
+        # #..first transfer
+        # # OR
+        # #..transfer complete, place new sample
+        # if n_sample == 0:
+            # n_sample = n_sample + 1
+            # dut.s_axis_rfrx_tvalid.value = int(1)
+            # dut.s_axis_rfrx_tdata.value = int(100)
+        # elif (dut.s_axis_rfrx_tready.value) and (dut.s_axis_rfrx_tvalid.value) and (n_sample < n_sample_max):
+            # n_sample = n_sample + 1
+            # dut.s_axis_rfrx_tvalid.value = int(1)
+            # dut.s_axis_rfrx_tdata.value = int(100 + n_sample)
+        # elif (dut.s_axis_rfrx_tready.value) and (dut.s_axis_rfrx_tvalid.value) and (n_sample >= n_sample_max):
+            # dut.s_axis_rfrx_tvalid.value = int(0)
 
 
-        #check for UDP packets to be forwarded to device
-        try:
-            message = params['queues']['recv_queue'].get_nowait()
-            print('RECV', message)
-        except queue.Empty:
-            pass
+        #check for UDP packets to be forwarded to device, if no active transfer
+        if not message:
+            try:
+                message = params['queues']['recv_queue'].get_nowait()
+                print('SOCK>DEV', message)
+                print("  sending: ", end="")
+            except queue.Empty:
+                pass
+
+        #AXI input to device
+        #..transfer complete
+        if (dut.s_axis_sys_tready.value) and (dut.s_axis_sys_tvalid.value):
+            dut.s_axis_sys_tvalid.value = int(0)
+            dut.s_axis_sys_tlast.value = int(0)
+        #..place new data on interface
+        if (message \
+        and (dut.s_axis_sys_tready.value or (dut.s_axis_sys_tvalid.value == 0))):
+            dut.s_axis_sys_tdata.value = message[0]
+            print(message[0], end='..')
+            dut.s_axis_sys_tvalid.value = int(1)
+            message = message[1:]
+            if not message:
+                dut.s_axis_sys_tlast.value = int(1)
+                print('(done)')
 
         #receive UDP output from device and forward to interface
         if (dut.m_axis_sys_tvalid.value):
