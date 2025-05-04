@@ -1,3 +1,6 @@
+#misc
+*.h5
+
 #cocotb output
 sim_build/
 */results.xml
