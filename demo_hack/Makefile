@@ -4,6 +4,7 @@
 all:
 	@mkdir -p build
 	iverilog -o build/trxpc1_core -c source_files.list -I ${SANIMUT_FPGA_SOURCEDIR}
+	iverilog -o build/sys_core -c source_files.list -I ${SANIMUT_FPGA_SOURCEDIR}
 
 clean:
 	@rm -rf build
