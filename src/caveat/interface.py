@@ -2,7 +2,7 @@
 # Author(s): Torsten Reuschel
 
 """
-Generic socket
+Maps between socket and AXI-Stream
 """
 
 import queue
@@ -10,126 +10,92 @@ import socket
 import threading
 import time
 
+from cocotbext.axi import AxiStreamSource, AxiStreamSink
 
-class SocketInterface():
-    def __init__(self, remote_address: str, remote_port: int, local_port: int):
-      """Initialize emulator interface via socket
-      """
-      self.params = {
-          'UDPSocket': None,
-          'bufferSize': 8192,
-          'threads': {},
-          'stop': False,
-          'queues': {},
-          }
-      self.remote_address = remote_address
-      self.remote_port = remote_port
-      self.local_port = local_port
-      self.comms_init_func()
 
-    def forward_packet_emulator_to_socket(self, message=None):
-        """Place packet/payload on sending queue
+class SocketAXIS():
+    def __init__(self, remote_address: str, remote_port: int, local_port: int,
+            axis_sink: AxiStreamSink, axis_source: AxiStreamSource):
+        """Initialize socket interface
         """
-        if message:
-            print('DEV>SOCK', message)
-            self.params['queues']['send_queue'].put(message)
+        self.socket = None
+        self.threads = {}
+        self.bufferSize = 8192
+        self.stop = False
 
+        self.remote_address = remote_address
+        self.remote_port = remote_port
+        self.local_port = local_port
 
-    def comms_init_func(self):
-        """This function initializes the socket and queues
+        self.axis_sink = axis_sink
+        self.axis_source = axis_source
+
+        #initiate communications
+        self.communication_start()
+
+    def __del__(self):
+        """Destructor
         """
-        #create required queues
-        self.params['stop'] = False
-        self.params['queues']['send_queue'] = queue.Queue()
-        self.params['queues']['recv_queue'] = queue.Queue()
+        self.communication_stop()
 
+    def communication_start(self):
+        """Callback to start communications between interfaces
+        """
         #create UDP socket
-        if self.params['UDPSocket'] is not None:
-            print('UDP Socket already in use')
+        if self.socket is not None:
+            print('Socket already in use')
             return
 
         #initialize communication
-        udp_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-        udp_socket.bind(('', self.local_port))
-        #UDPSocket.setblocking(0)
-        self.params['UDPSocket'] = udp_socket
-        print('UDP server up and listening')
+        self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.socket.bind(('', self.local_port))
 
-        #thread for handling incoming and outgoing packets
-        self.params['threads']['comms'] = threading.Thread(target=self.comms_operation_func,
+        #thread for forwarding packets between interfaces
+        self.threads['comms'] = threading.Thread(target=self.communication_operation,
                                                       args=())
-        self.params['threads']['comms'].start()
+        self.threads['comms'].start()
 
-    def comms_stop_func(self):
-        """Callback to shutdown everything
+        #print status
+        print('Socket<>AXIS active')
+
+    def communication_stop(self):
+        """Callback to shut communications down
         """
-        if self.params['UDPSocket'] is not None:
-            #update log and status
-            print('Shutting down... ')
-
-            #shut communication down at host
-            self.params['stop'] = True
-            for curr_thread in self.params['threads'].values():
-                print('joing thread {}'.format(curr_thread))
+        if self.socket is not None:
+            self.stop = True
+            for curr_thread in self.threads.values():
+                print('joing thread {}'.format(curr_thread), flush=True)
                 curr_thread.join()
-            print('Closing socket')
-            self.params['UDPSocket'].close()
-            self.params['UDPSocket'] = None
+            self.socket.close()
+            self.socket = None
+            print('Shutdown complete', flush=True)
 
-            #update log and status
-            print('Shutdown complete')
-
-    def comms_operation_func(self, logfilename=None, verbosity=0, timeout=0.01):
-        """Main thread to manage sending and receiving packets
+    def communication_operation(self, timeout=0.01):
+        """Main thread to pass packets between interfaces
         """
-        pkg_counter = 0
+        #FIXME: split this function into two: one for socket>>AXIS, and one for AXIS>>socket
 
-        #output status to log
-        print('Starting comms_func')
+        #set timeout for blocking loop in case of no incoming packets
+        self.socket.settimeout(0)
 
-        #communications loop
-        while not self.params['stop']:
+        while not self.stop:
             #timeout to reduce CPU load
             time.sleep(timeout)
 
-            # Regular operation: check for send (emulator to interface) packet
+            #foward packets from AXIS to socket
             try:
-                send_message = self.params['queues']['send_queue'].get_nowait()
-                if verbosity > 0:
-                    print('Sending - {}'.format(send_message))
-                if logfilename is not None:
-                    file_desc = open(logfilename, mode='a')
-                    file_desc.write('{} : S : {}\n'.format(time.time(), send_message))
-                    file_desc.close()
-                self.params['UDPSocket'].sendto(send_message, (self.remote_address, self.remote_port))
+                message = self.axis_sink.read_nowait()
+                if message:
+                    print('DEV>SOCK', message, flush=True)
+                    self.socket.sendto(bytearray(message), (self.remote_address, self.remote_port))
             except queue.Empty:
                 pass
 
-            # Regular operation: check for receive (interface to emulator) packet
+            #forward packets from socket to AXIS
             try:
-                self.params['UDPSocket'].settimeout(0) #timeout for blocking loop in case of no incoming packets
-                recv_message = self.params['UDPSocket'].recv(self.params['bufferSize'])
-                print('SOCK>DEV', recv_message)
+                message = self.socket.recv(self.bufferSize)
+                print('SOCK>DEV', list(message), flush=True)
 
-                #optional logging of raw packet data
-                if logfilename is not None:
-                    file_desc = open(logfilename, mode='a')
-                    file_desc.write('{} : R : {}\n'.format(time.time(), recv_message))
-                    file_desc.close()
-                # for name,val in COMM_PACKET.items():
-                    # if val == recv_message[0:3]:
-                        # if verbosity > 0:
-                            # print('{} - {}'.format(name, recv_message[4:]))
-                        # break
-
-                #process packet
-                #process FPGA response in main thread, may start separate thread if deemed necessary
-                self.params['queues']['recv_queue'].put(recv_message)
-            except Exception as err:
-                if verbosity > 0:
-                    print('Exception: {}'.format(err))
-                    print('Nothing received')
+                self.axis_source.put(message)
+            except:
                 pass
-
-        #output status to log
-        print('Stopping COMMS Loop')
