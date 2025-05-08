@@ -17,10 +17,10 @@ def create_interface_socket_to_axis(self: cocotb.handle.SimHandleBase,
         axis_bus_module_output: str = "m_axis"):
     #create AXIS interface
     axis_sink = AxiStreamSink(
-        AxiStreamBus.from_prefix(self, axis_bus_module_input),
+        AxiStreamBus.from_prefix(self, axis_bus_module_output),
         self.clk, self.rst)
     axis_source = AxiStreamSource(
-        AxiStreamBus.from_prefix(self, axis_bus_module_output),
+        AxiStreamBus.from_prefix(self, axis_bus_module_input),
         self.clk, self.rst)
     #create, connect, and open socket
     self._if_socket_handle = SocketAXIS(
