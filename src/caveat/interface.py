@@ -5,12 +5,12 @@
 Maps between socket and AXI-Stream
 """
 
-import queue
+import cocotb
 import socket
 import threading
 import time
 
-from cocotbext.axi import AxiStreamSource, AxiStreamSink
+from cocotbext.axi import AxiStreamSource, AxiStreamSink, AxiStreamFrame
 
 
 class SocketAXIS():
@@ -20,7 +20,7 @@ class SocketAXIS():
         """
         self.socket = None
         self.threads = {}
-        self.bufferSize = 8192
+        self.buffer_size = 8192
         self.stop = False
 
         self.remote_address = remote_address
@@ -70,32 +70,27 @@ class SocketAXIS():
             self.socket = None
             print('Shutdown complete', flush=True)
 
-    def communication_operation(self, timeout=0.01):
+    def communication_operation(self):
         """Main thread to pass packets between interfaces
         """
-        #FIXME: split this function into two: one for socket>>AXIS, and one for AXIS>>socket
-
         #set timeout for blocking loop in case of no incoming packets
         self.socket.settimeout(0)
 
         while not self.stop:
-            #timeout to reduce CPU load
-            time.sleep(timeout)
+            #forward packets from socket to AXIS
+            message = None
+            try:
+                message = self.socket.recv(self.buffer_size)
+                print('SOCK>DEV', list(message), flush=True)
+                self.axis_source.send_nowait(message)
+            except:
+                pass
 
             #foward packets from AXIS to socket
             try:
-                message = self.axis_sink.read_nowait()
+                message = self.axis_sink.recv_nowait(compact=True)
                 if message:
                     print('DEV>SOCK', message, flush=True)
                     self.socket.sendto(bytearray(message), (self.remote_address, self.remote_port))
-            except queue.Empty:
-                pass
-
-            #forward packets from socket to AXIS
-            try:
-                message = self.socket.recv(self.bufferSize)
-                print('SOCK>DEV', list(message), flush=True)
-
-                self.axis_source.put(message)
-            except:
+            except cocotb.queue.QueueEmpty:
                 pass
