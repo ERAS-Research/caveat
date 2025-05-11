@@ -90,7 +90,7 @@ class SocketAXIS():
             try:
                 message = self.axis_sink.recv_nowait(compact=True)
                 if message:
-                    print('DEV>SOCK', message, flush=True)
+                    print('DEV>SOCK', list(message), flush=True)
                     self.socket.sendto(bytearray(message), (self.remote_address, self.remote_port))
             except cocotb.queue.QueueEmpty:
                 pass
