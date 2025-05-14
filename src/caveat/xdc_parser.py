@@ -8,3 +8,4 @@ Parse xdc constraint files
 def read_xdc(infilenames: list):
     for infilename in infilenames:
         print(infilename)
+    return len(infilenames)
