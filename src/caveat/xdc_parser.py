@@ -10,7 +10,7 @@ import math
 from .iopin import IOPin, IOPinType
 
 
-def read_xdc(infilenames: list):
+def read_xdc(infilenames: list=[]):
     """Read in and parse xdc constraint files based on Vivado user guide UG903
     (v2024.2) December 20, 2024, which defines physical constraints generally by
     means of properties with regard to an object:
