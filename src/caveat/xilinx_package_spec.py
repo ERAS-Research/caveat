@@ -8,6 +8,10 @@
 Import and parse Xilinx package descriptions
 """
 
+
+import math
+
+
 def read_in_package_specification(infilename):
     """
     Read in Xilinx package descriptions as provided at
@@ -60,11 +64,11 @@ def get_io_voltage_max_from_iotype_7series(iotype: str):
     """Information according to 7 Series FPGAs SelectIO Resources User Guide
     (UG471), Table 1-1
     """
-    iostandard_db = {
+    iotype_db = {
         'HR': 3.3,
         'HP': 1.8,
         }
-    return iostandard_db.get(iostandard, math.nan)
+    return iotype_db.get(iotype, math.nan)
 
 
 def get_pin_current_max_from_iostandard_7series(iostandard: str, bank: str):
