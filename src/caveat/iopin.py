@@ -18,7 +18,7 @@ class IOPinType(Enum):
 
 class IOPin():
     def __init__(self, name: str, param: dict=dict(),
-            iotype: IOPinType=IOPinType.HIGHZ, voltagebank: str=None,
+            iotype: IOPinType=IOPinType.HIGHZ, group: str=None,
             voltage_max: int=np.nan, current_max: int=np.nan,
             input_impedance: np.complex128=np.nan):
         #store inputs
@@ -26,3 +26,9 @@ class IOPin():
         for key, value in locals().items():
             if value is not None:
                 self.param[key] = value
+
+    def __getitem__(self, key):
+        return self.param.get(key, None)
+
+    def __setitem__(self, key, value):
+        self.param[key] = value
