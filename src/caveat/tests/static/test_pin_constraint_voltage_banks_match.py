@@ -11,7 +11,7 @@ import os
 import sys
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))  #FIXME: refactor module import
-from caveat import xilinx_package_spec
+from caveat.fileio import xilinx_package_spec
 
 
 def test_pin_constraint_voltage_banks_match(kintex7_iopin_specification,
