@@ -2,7 +2,7 @@
 # Author(s): Torsten Reuschel
 
 """
-sanimut static verification
+static verification
 """
 
 
