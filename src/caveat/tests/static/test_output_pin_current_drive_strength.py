@@ -29,9 +29,9 @@ def test_output_pin_current_drive_strength(kintex7_iopin_specification,
     current limit.
 
     Requires the following fixtures:
-      kintex7_iopin_specification: xilinx_package_spec.read_in_package_specification(...)
-      net_specification: dict={'pinN':{'voltage_max':''}, ...}
-      pin_constraints: dict=xdc_parser.read_xdc(...)
+      kintex7_iopin_specification: fileio.xilinx_package_spec.read_in_package_specification(...)
+      net_specification: dict=fileio.netlist_parser.read_netspec_from_csv(...)
+      pin_constraints: dict=fileio.xdc_parser.read_xdc(...)
     """
     #verify presence of meaningful input data
     assert kintex7_iopin_specification != None, "Missing Kintex7 vendor I/O pin specification"
