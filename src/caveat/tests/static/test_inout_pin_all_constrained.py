@@ -6,7 +6,7 @@ sanimut static verification
 """
 
 
-def test_all_iopins_constrained(pin_constraints, net_specification):
+def test_inout_pin_all_constrained(pin_constraints, net_specification):
     """Verify that all physical pins are constrained: starting with a list of
     netlisted pins, verify that
      - corresponding pin constrains exist, and
