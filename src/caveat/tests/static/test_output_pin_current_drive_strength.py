@@ -27,12 +27,16 @@ def test_output_pin_current_drive_strength(kintex7_iopin_specification,
     resistance such as Rload=1MOhm for input pins, this test is practically
     guaranteed to pass for all input pin configurations, because of the implied
     current limit.
+
+    Requires the following fixtures:
+      kintex7_iopin_specification: xilinx_package_spec.read_in_package_specification(...)
+      net_specification: dict={'pinN':{'voltage_max':''}, ...}
+      pin_constraints: dict=xdc_parser.read_xdc(...)
     """
     #verify presence of meaningful input data
     assert kintex7_iopin_specification != None, "Missing Kintex7 vendor I/O pin specification"
     assert net_specification != None, "Missing netlist design specification"
     assert pin_constraints != None, "Missing netlist design specification"
-    assert pin_constraints != None, "Missing pin constraints"
 
     for pin in pin_constraints:
         pin_iotype = xilinx_package_spec.get_iotype(
