@@ -6,8 +6,12 @@ Parse xdc constraint files
 """
 
 import math
+import os
+import sys
 
-from .iopin import IOPin, IOPinType
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../')))  #FIXME: refactor module import
+from fileio import xilinx_package_spec
+from iopin import IOPin, IOPinType
 
 
 def read_xdc(infilenames: list=[]):
