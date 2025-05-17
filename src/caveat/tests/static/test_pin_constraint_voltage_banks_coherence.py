@@ -14,7 +14,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../.
 from caveat.fileio import xilinx_package_spec
 
 
-def test_pin_constraint_voltage_banks_match(kintex7_iopin_specification,
+def test_pin_constraint_voltage_banks_coherence(kintex7_iopin_specification,
         net_specification, pin_constraints):
     """Verify that all physical pins are constrained: starting with a list of
     netlisted pins, verify that
