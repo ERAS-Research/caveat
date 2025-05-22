@@ -2,19 +2,19 @@
 # Author(s): Torsten Reuschel
 
 """
-sanimut static verification
+static verification
 """
 
 
-def test_all_iopins_constrained(pin_constraints, net_specification):
+def test_inout_pin_all_constrained(pin_constraints, net_specification):
     """Verify that all physical pins are constrained: starting with a list of
     netlisted pins, verify that
      - corresponding pin constrains exist, and
      - no excess pin constraints exist, as this suggests an incomplete netlist.
 
     Requires the following fixtures:
-      pin_constraints: dict=xdc_parser.read_xdc(...)
-      net_specification: dict={'pin1':'', 'pin2':'', ..., 'pinN':''}
+      pin_constraints: dict=fileio.xdc_parser.read_xdc(...)
+      net_specification: dict=fileio.netlist_parser.read_netspec_from_csv(...)
     """
     list_unchecked = list(net_specification.keys())
     list_checked = list()
