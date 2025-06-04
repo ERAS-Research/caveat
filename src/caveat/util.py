@@ -8,6 +8,7 @@ import unicodedata
 
 def purge_unicode_control_character(in_string):
     """Remove control characters from a given string
+    Adopted from https://stackoverflow.com/a/19016117 under CC BY-SA 3.0
     """
     return ''.join(char for char in in_string if unicodedata.category(char)[0] != 'C')
 
