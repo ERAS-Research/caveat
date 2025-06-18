@@ -69,24 +69,26 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
 
     if data_dict:
         for ii in range(len(data_dict)):
-            truncated_data = None
             handle_names = list(data_dict.keys())
             handle = list(data_dict.values())[ii]
             if not all(isinstance(item, (int)) for item in handle):
                 handle = [float('nan') if 'z' in val or 'x' in val else val.integer for val in handle]
 
             xrange = list(range(len(handle)))
+            data_proc = None
             if truncate:
                 leading = handle[0]
-                truncated_data = next((i for i, v in enumerate(handle) if v != leading), None)
-            #skip plot, if 'truncated_data' is empty #FIXME: what if truncate if not enabled?
-            if truncated_data is None:
+                data_proc = next((i for i, v in enumerate(handle) if v != leading), None)
+            else:
+                data_proc = next((i for i, v in enumerate(handle)), None)
+            #skip plot, if 'truncated_data' is empty
+            if data_proc is None:
                 continue
 
             fig = plt.figure()
             plt.step(
-                xrange[truncated_data:],
-                handle[truncated_data:],
+                xrange[data_proc:],
+                handle[data_proc:],
                 where='mid')
             plt.xlabel("Time (ns)")
             plot_data += handle_names[ii]
