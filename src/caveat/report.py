@@ -68,33 +68,24 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
         plot_data += mpld3.fig_to_html(fig)
 
     if data_dict:
-        for ii in range(len(data_dict)):
-            handle_names = list(data_dict.keys())
-            handle = list(data_dict.values())[ii]
-            if not all(isinstance(item, (int)) for item in handle):
-                handle = [float('nan') if 'z' in val or 'x' in val else val.integer for val in handle]
-
-            xrange = list(range(len(handle)))
-            data_proc = None
-            if truncate:
-                leading = handle[0]
-                data_proc = next((i for i, v in enumerate(handle) if v != leading), None)
-            else:
-                data_proc = next((i for i, v in enumerate(handle)), None)
-            #skip plot, if 'truncated_data' is empty
-            if data_proc is None:
+        for key, data in data_dict.items():
+            #sanity check: skip monitors that did not record events
+            if len(data) == 1:
                 continue
-
+            #prepare data for plotting: extract and sanitize
+            dt, dx = list(zip(*data))
+            dt = list(dt)
+            dx = list(dx)
+            for ii, xx in enumerate(dx):
+                if ('z' in xx) or ('x' in xx):
+                    dx[ii] = float('nan')
+            #plot data
             fig = plt.figure()
-            plt.step(
-                xrange[data_proc:],
-                handle[data_proc:],
-                where='mid')
+            plt.step(dt, dx, where='mid')
             plt.xlabel("Time (ns)")
-            plot_data += handle_names[ii]
+            plot_data += key
             plot_data += mpld3.fig_to_html(fig)
         return plot_data
-
 
 def make_report(testname: str, cfg_plot: dict, outfilepath: str='../results/'):
     """Compile stringified matplotlib figures into HTML report
