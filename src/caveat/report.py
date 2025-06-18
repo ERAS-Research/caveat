@@ -80,7 +80,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
                 leading = handle[0]
                 data_proc = next((i for i, v in enumerate(handle) if v != leading), None)
             else:
-                data_proc = next((i for i, v in enumerate(handle)), None)
+                data_proc = 0
             #skip plot, if 'truncated_data' is empty
             if data_proc is None:
                 continue
@@ -93,6 +93,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
             plt.xlabel("Time (ns)")
             plot_data += handle_names[ii]
             plot_data += mpld3.fig_to_html(fig)
+    return plot_data
 
 
 def make_report(testname: str, cfg_plot: dict, outfilepath: str='../results/'):
