@@ -69,7 +69,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
 
     if data_dict:
         for ii in range(len(data_dict)):
-            truncated_plot_data = None
+            truncated_data = None
             handle_names = list(data_dict.keys())
             handle = list(data_dict.values())[ii]
             if not all(isinstance(item, (int)) for item in handle):
@@ -78,13 +78,16 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
             xrange = list(range(len(handle)))
             if truncate:
                 leading = handle[0]
-                truncated_plot_data = next((i for i, v in enumerate(handle) if v != leading), None)
-            #skip plot, if truncated_plot_data is empty #FIXME: what if truncate if not enabled?
-            if truncated_plot_data is None:
+                truncated_data = next((i for i, v in enumerate(handle) if v != leading), None)
+            #skip plot, if 'truncated_data' is empty #FIXME: what if truncate if not enabled?
+            if truncated_data is None:
                 continue
 
             fig = plt.figure()
-            plt.step(xrange[truncation:], handle[truncation:], where='mid')
+            plt.step(
+                xrange[truncated_data:],
+                handle[truncated_data:],
+                where='mid')
             plt.xlabel("Time (ns)")
             plot_data += handle_names[ii]
             plot_data += mpld3.fig_to_html(fig)
