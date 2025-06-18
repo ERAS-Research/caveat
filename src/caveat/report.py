@@ -70,7 +70,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
     if data_dict:
         for key, data in data_dict.items():
             #sanity check: skip monitors that did not record events
-            if len(data) == 1:
+            if len(data) < 2:
                 continue
             #prepare data for plotting: extract and sanitize
             dt, dx = list(zip(*data))
@@ -79,6 +79,8 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
             for ii, xx in enumerate(dx):
                 if ('z' in xx) or ('x' in xx):
                     dx[ii] = float('nan')
+                else:
+                    dx[ii] = float(xx)
             #plot data
             fig = plt.figure()
             plt.step(dt, dx, where='mid')
