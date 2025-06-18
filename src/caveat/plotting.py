@@ -90,9 +90,11 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
             plot_data += mpld3.fig_to_html(fig)
 
 
-def make_report(testname, outfilepath='../results/', plot_data)
+def make_report(testname: str, cfg_plot: dict, outfilepath: str='../results/'):
     """Compile stringified matplotlib figures into HTML report
     """
+    plot_data = get_html_plot_data(testname, **cfg_plot)
+
     html_report = html_template.format(plot_divs = plot_data)
     outfilename = '{:s}/caveat_signals_{:s}.html'.format(outfilepath, testname)
     with open(outfilename, 'w') as f:
