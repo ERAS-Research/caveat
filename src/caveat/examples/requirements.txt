@@ -1,0 +1,4 @@
+cocotb==1.9.2
+cocotb_test==0.2.6
+pytest>=7.3.1
+
