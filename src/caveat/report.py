@@ -3,6 +3,8 @@
 
 import matplotlib.pyplot as plt
 import mpld3
+import os
+from pathlib import Path
 
 ### FIXME: ignore deprecation warnings from mpld3 library
 # patch has been merged upstream, remove this section once released,
@@ -29,7 +31,7 @@ html_template = """
 def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
     """Stringify plot data for HTML reporting
     """
-    plot_data = ""
+    plot_data = "<h2>{:s}</h2>".format(testname)
 
     if axis_dict:
         fig = plt.figure()
@@ -89,12 +91,15 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
             plot_data += mpld3.fig_to_html(fig)
         return plot_data
 
-def make_report(testname: str, cfg_plot: dict, outfilepath: str='../results/'):
+def make_report(testname: str, cfg_plot: dict, outfilepath: str='../results/dynamic/'):
     """Compile stringified matplotlib figures into HTML report
     """
+    #create report
     plot_data = get_html_plot_data(testname, **cfg_plot)
-
     html_report = html_template.format(plot_divs = plot_data)
-    outfilename = '{:s}/caveat_signals_{:s}.html'.format(outfilepath, testname)
-    with open(outfilename, 'w') as f:
+
+    #write report to file
+    outfilesubdir = os.path.split(testname)[0]
+    Path(os.path.join(outfilepath, outfilesubdir)).mkdir(parents=True, exist_ok=True)
+    with open('{:s}/{:s}.html'.format(outfilepath, testname), 'w') as f:
         f.write(html_report)
