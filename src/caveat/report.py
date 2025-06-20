@@ -34,41 +34,52 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
     plot_data = "<h2>{:s}</h2>".format(testname)
 
     if axis_dict:
-        fig = plt.figure()
-        height = 0
+
 
         for signal in axis_dict:
-            data = axis_dict[signal]
-
-            for key in data:
-                signal_time = data[key]
-                print("time for signal ", signal, "is ", key )
-                signal_time, time_before, len_message, time_after,rgb = key, *data[key]
-
-                plt.text(0, height + .3, signal)
-                plt.step(
-                    [signal_time, time_before],
-                    [height, height],
-                    color='tab:blue')
+            fig = plt.figure()
+            height = 0
+            data_list = axis_dict[signal]
+            print("data now looks like:", data_list)
+            print("signal name is", signal)
+            previous = 0
+            xlim_var = None
+            for datum in data_list:
+                print("datum is:", datum)
+                data, start, end, period = datum
+                if xlim_var is None:
+                    xlim_var = start
+                print("all info:", data,start,end,period)
+                header = data[:3]
+                rgb = [xx/255 for xx in header]
+                print(header)
+                # plt.text(xlim_var, height + .3, signal, ha='left')
+                if previous != 0:
+                    plt.step(
+                        [previous, start],
+                        [height, height],
+                        color='tab:blue')
 
                 plt.fill_between(
-                    [time_before, time_before + 3],
+                    [start, start + 2*period],
                     height - .2,
                     [height + .2, height + .2],
                     color=rgb,
                     step='pre')
 
-                if len_message > 3:
+                if len(data) > 3:
                     plt.fill_between(
-                        [time_before + 3, time_before + len_message],
+                        [start + 2*period, end],
                         height - .2,
                         [height + .2, height + .2],
                         color='k',
                         step='pre')
-                height -= 1
-        plt.ylim(height-1, 1)
-        plot_data += mpld3.fig_to_html(fig)
-
+                previous = end
+            height -= 1
+            plt.ylim(height-1, 1)
+            plt.xlim(xlim_var)
+            plot_data += signal + " - Axi Stream"
+            plot_data += mpld3.fig_to_html(fig)
     if data_dict:
         for key, data in data_dict.items():
             #sanity check: skip monitors that did not record events
