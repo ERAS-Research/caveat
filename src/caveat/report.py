@@ -40,16 +40,12 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
             fig = plt.figure()
             height = 0
             data_list = axis_dict[signal]
-            print("data now looks like:", data_list)
-            print("signal name is", signal)
             previous = 0
             xlim_var = None
             for datum in data_list:
-                print("datum is:", datum)
                 data, start, end, period = datum
                 if xlim_var is None:
                     xlim_var = start
-                print("all info:", data,start,end,period)
                 header = data[:3]
                 rgb = [xx/255 for xx in header]
                 print(header)
