@@ -79,7 +79,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
             dt = list(dt)
             dx = list(dx)
             for ii, xx in enumerate(dx):
-                if ('z' in xx) or ('x' in xx):
+                if ('z' in str(xx)) or ('x' in str(xx)):
                     dx[ii] = float('nan')
                 else:
                     dx[ii] = float(xx)
