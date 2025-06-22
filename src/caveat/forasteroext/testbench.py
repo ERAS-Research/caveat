@@ -6,7 +6,7 @@
 # Licensed under the Apache License, Version 2.0
 # Copyright 2023, Peter Birch, mailto:peter@lightlogic.co.uk
 
-#FIXME: remove project-specific assumptions/code: COMM_PACKET, ethernet/in/outstream
+#FIXME: remove project-specific assumptions/code: ethernet / in-/out-stream naming
 
 import cocotb
 from cocotb.handle import HierarchyObject
@@ -16,16 +16,15 @@ from forastero.monitor import MonitorEvent
 
 from .stream import StreamBackpressure, StreamMonitor, StreamInitiator, StreamIO, StreamResponder, StreamTransaction, StreamTransactionLast
 
-from caveatext.sanimut import COMM_PACKET
-from framework.src.caveat.report import make_report
+from ..report import make_report
 
 
 class Testbench(BaseBench):
-    """Testbench wrapped around The FPGA core. Helper methods added from the
-    Forastero example case to more easily work with AXI stream and to use a list
-    as a monitor reference
+    """Augmented testbench environment for ease of interfacing with DUT as well
+    as capturing signals and reporting.
+    This class is an alternative to 'CaveatBench'.
     """
-    def __init__(self, dut: HierarchyObject) -> None:
+    def __init__(self, dut: HierarchyObject, config: dict={}) -> None:
         super().__init__(
             dut,
             clk=dut.clk,
@@ -34,9 +33,7 @@ class Testbench(BaseBench):
             clk_period=8,
             clk_units="ns",
         )
-        self._config = {
-            'init_message': COMM_PACKET.get('SYS_ETH_CONF_BROADCAST', None),
-        }
+        self._config = config
         self.handle_dict = {}
         self.handle_dict["eth_out_mon"] = []
 
@@ -78,10 +75,15 @@ class Testbench(BaseBench):
         """
         return self._config.get(key, None)
 
-    def get_header_from_name(self, name):
-        """Read command packet header from command name
+    def append_config(self, config: dict):
+        """Append entries to testbench configuration
         """
-        return COMM_PACKET.get(name, None)
+        self._config = self._config | config
+
+    def clear_config(self) -> None:
+        """Clear all entries from testbench configuration
+        """
+        self._config = dict()
 
     def generate_plot(self, truncate=False, testname: str=''):
         """Generate visual report of signals
