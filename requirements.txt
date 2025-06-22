@@ -4,7 +4,6 @@ cocotbext-axi==0.1.24
 forastero>=1.2.1
 git
 matplotlib
+mpld3
 numpy
 pytest>=7.3.1
-pytest-reporter-html-dots>=0.11.0
-pytest-xdist>=3.7.0
