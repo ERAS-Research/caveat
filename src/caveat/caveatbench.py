@@ -1,8 +1,6 @@
 # Copyright (C) 2025 ERAS Research Group and sanimut Development Team
 # Author(s): Torsten Reuschel, Murray Ferris
 
-#FIXME: refactor COMM_PACKET include and make this file generally available
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
@@ -10,7 +8,6 @@ from cocotbext.axi import AxiStreamBus, AxiStreamSource, AxiStreamSink
 from cocotb.handle import ModifiableObject
 import logging
 
-from caveatext.sanimut import COMM_PACKET
 from framework.src.caveat.caveatmonitor import CaveatMonitor
 from framework.src.caveat.report import make_report
 
@@ -19,17 +16,15 @@ class CaveatBench():
     """Testbench class for embedding DUT in a reproducible test environment
     including extended setup and utility functions related to the DUT (device
     under test).
-    This class may be replaced by a forastero-based testbench (top be determined).
+    This class is an alternative to 'forasteroext.TestBench'.
     """
-    def __init__(self, dut):
+    def __init__(self, dut, config: dict={}):
         self.dut = dut
         self.monitor_list = {}
         self.handle_dict = {}
         self.sources = {}
         self.sinks = {}
-        self._config = {
-            'init_message': COMM_PACKET.get('SYS_ETH_CONF_BROADCAST', None),
-        }
+        self._config = config
 
     def get_clock_handle(self, clk):
         """Obtain handle to clock, which may be identified by string name.
@@ -50,8 +45,18 @@ class CaveatBench():
         """
         return self._config.get(key, None)
 
-    async def add_sender(self, label: str, clk, prefix: str='', signals: dict={},
-            verbosity_level=logging.WARNING):
+    def append_config(self, config: dict):
+        """Append entries to testbench configuration
+        """
+        self._config = self._config | config
+
+    def clear_config(self) -> None:
+        """Clear all entries from testbench configuration
+        """
+        self._config = dict()
+
+    async def add_sender_axis(self, label: str, clk, prefix: str='',
+            signals: dict={}, verbosity_level=logging.WARNING):
         """Add AXI-Stream interface capable of sending data to the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
         or a dictionary of signals following the pattern
@@ -78,7 +83,7 @@ class CaveatBench():
                 logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
             self.sources[label] = AxiStreamSource(bus, clk)
 
-    async def add_receiver(self, label: str, clk, prefix: str='',
+    async def add_receiver_axis(self, label: str, clk, prefix: str='',
             signals: dict={}, verbosity_level=logging.WARNING):
         """Add AXI-Stream interface capable of receiving data from the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
