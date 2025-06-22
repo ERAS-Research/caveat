@@ -9,18 +9,20 @@ import cocotb
 import socket
 import threading
 
-from cocotbext.axi import AxiStreamSource, AxiStreamSink, AxiStreamFrame
+from cocotbext.axi import AxiStreamSource, AxiStreamSink
 
 
 class SocketAXIS():
     def __init__(self, remote_address: str, remote_port: int, local_port: int,
-            axis_sink: AxiStreamSink, axis_source: AxiStreamSource):
+            axis_sink: AxiStreamSink, axis_source: AxiStreamSource,
+            verbose: bool=False):
         """Initialize socket interface
         """
         self.socket = None
         self.threads = {}
         self.buffer_size = 8192
         self.stop = False
+        self.verbose = verbose
 
         self.remote_address = remote_address
         self.remote_port = remote_port
@@ -42,8 +44,7 @@ class SocketAXIS():
         """
         #create UDP socket
         if self.socket is not None:
-            print('Socket already in use')
-            return
+            raise RuntimeError('Socket already in use')
 
         #initialize communication
         self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
@@ -54,20 +55,19 @@ class SocketAXIS():
                                                       args=())
         self.threads['comms'].start()
 
-        #print status
-        print('Socket<>AXIS active')
-
     def communication_stop(self):
         """Callback to shut communications down
         """
         if self.socket is not None:
             self.stop = True
             for curr_thread in self.threads.values():
-                print('joing thread {}'.format(curr_thread), flush=True)
+                if self.verbose:
+                    print('joing thread {}'.format(curr_thread), flush=True)
                 curr_thread.join()
             self.socket.close()
             self.socket = None
-            print('Shutdown complete', flush=True)
+            if self.verbose:
+                print('Shutdown complete', flush=True)
 
     def communication_operation(self):
         """Main thread to pass packets between interfaces
@@ -80,7 +80,8 @@ class SocketAXIS():
             message = None
             try:
                 message = self.socket.recv(self.buffer_size)
-                print('SOCK>DEV', list(message), flush=True)
+                if self.verbose:
+                    print('SOCK>DEV', list(message), flush=True)
                 self.axis_source.send_nowait(message)
             except:
                 pass
@@ -89,7 +90,8 @@ class SocketAXIS():
             try:
                 message = self.axis_sink.recv_nowait(compact=True)
                 if message:
-                    print('DEV>SOCK', list(message), flush=True)
+                    if self.verbose:
+                        print('DEV>SOCK', list(message), flush=True)
                     self.socket.sendto(bytearray(message), (self.remote_address, self.remote_port))
             except cocotb.queue.QueueEmpty:
                 pass
