@@ -8,7 +8,6 @@ Maps between socket and AXI-Stream
 import cocotb
 import socket
 import threading
-import time
 
 from cocotbext.axi import AxiStreamSource, AxiStreamSink, AxiStreamFrame
 
