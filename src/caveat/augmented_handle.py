@@ -8,7 +8,7 @@ Augments cocotb simulation handle for use in CAVEAT environment
 import cocotb
 from cocotbext.axi import AxiStreamBus, AxiStreamSource, AxiStreamSink
 
-from .interface import SocketAXIS
+from .interface.socket_axis import SocketAXIS
 
 
 def create_interface_socket_to_axis(self: cocotb.handle.SimHandleBase,
