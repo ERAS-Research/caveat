@@ -36,7 +36,7 @@ def test_fifo_throughput():
     """pytest wrapper to capture test results from cocotb_test runner
     """
     run(module = __name__,
-        verilog_sources = ['axis_fifo.v'],
+        verilog_sources = ['rtl/axis_fifo.v'],
         toplevel = "axis_fifo",
         sim_build = 'build/sim_build/',
         timescale  = "10ns/10ns",
