@@ -2,8 +2,10 @@
 # Author(s): Murray Ferris, Torsten Reuschel
 
 import matplotlib.pyplot as plt
+import json
 import mpld3
 import os
+import wavedrom
 from pathlib import Path
 
 ### FIXME: ignore deprecation warnings from mpld3 library
@@ -28,52 +30,62 @@ html_template = """
     """
 
 
-def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
+def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, header_size=3):
     """Stringify plot data for HTML reporting
     """
     plot_data = "<h2>{:s}</h2>".format(testname)
 
     if axis_dict:
-
+        plot_data += "AxiStream monitored packets"
+        plot_data+="<br>"
+        plot_data+="<br>"
+        wavedrom_dict={"signal":[] }
 
         for signal in axis_dict:
-            fig = plt.figure()
-            height = 0
+
             data_list = axis_dict[signal]
             previous = 0
-            xlim_var = None
+
+            datastring=""
+            datalist=[]
             for datum in data_list:
                 data, start, end, period = datum
-                if xlim_var is None:
-                    xlim_var = start
-                header = data[:3]
-                rgb = [xx/255 for xx in header]
-                if previous != 0:
-                    plt.step(
-                        [previous, start],
-                        [height, height],
-                        color='tab:blue')
 
-                plt.fill_between(
-                    [start, start + 2*period],
-                    height - .2,
-                    [height + .2, height + .2],
-                    color=rgb,
-                    step='pre')
+                header = data[:header_size]
+                if (start-previous>0):
+                    datastring+="=...."
+                    label="idle: {} ns".format(start-previous)
+                    datalist.append(label)
+                ##this will add a length of 5 to your data
 
-                if len(data) > 3:
-                    plt.fill_between(
-                        [start + 2*period, end],
-                        height - .2,
-                        [height + .2, height + .2],
-                        color='k',
-                        step='pre')
+                datastring_builder="="
+                for __ in range(header_size-1):
+                    datastring_builder+="."##FIXME: manual appending of header length
+                label="H"
+                datalist.append(label)
+                datastring+=datastring_builder
+
+
+                if len(data) > header_size:
+                    datastring_builder="="
+                    print("data length is ",len(data))
+                    for __ in range(len(data)-(header_size+1)):
+                        datastring_builder += "."
+                    print("data is", data)
+                    datastring+=datastring_builder
+                    label="P"
+                    datalist.append(label)
                 previous = end
-            height -= 1
-            plt.ylim(height-1, 1)
-            plt.xlim(xlim_var)
-            plot_data += signal + " - Axi Stream"
-            plot_data += mpld3.fig_to_html(fig)
+            wavedrom_dict["signal"].append({"name":signal, "wave": datastring, "data": datalist})
+
+
+
+
+        wavedrom_dict_processed=json.dumps(wavedrom_dict)
+        svg=wavedrom.render(wavedrom_dict_processed)
+        plot_data+=svg.tostring()
+        plot_data+="<br>"
+
     if data_dict:
         for key, data in data_dict.items():
             #sanity check: skip monitors that did not record events
