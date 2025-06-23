@@ -8,8 +8,10 @@ from cocotbext.axi import AxiStreamBus, AxiStreamSource, AxiStreamSink
 from cocotb.handle import ModifiableObject
 import logging
 
-from framework.src.caveat.caveatmonitor import CaveatMonitor
-from framework.src.caveat.report import make_report
+# from framework.src.caveat.caveatmonitor import CaveatMonitor
+# from framework.src.caveat.report import make_report
+from caveatmonitor import CaveatMonitor
+from report import make_report
 
 
 class CaveatBench():
