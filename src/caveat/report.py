@@ -48,8 +48,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False):
                     xlim_var = start
                 header = data[:3]
                 rgb = [xx/255 for xx in header]
-                print(header)
-                # plt.text(xlim_var, height + .3, signal, ha='left')
                 if previous != 0:
                     plt.step(
                         [previous, start],
