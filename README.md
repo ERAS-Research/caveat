@@ -75,3 +75,8 @@ caveat_dynamic.run()
 #### Testing Environment
 
 To run unit tests, go to the main directory of *caveat* repo and type `pytest`.
+
+
+### Recommended Tools (optional)
+- **pytest-reporter-html-dots** for advanced html reporting
+- **pytest-xdist** for test parallelization (or pytest-parallel)

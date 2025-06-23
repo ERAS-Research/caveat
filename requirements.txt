@@ -1,0 +1,9 @@
+cocotb==1.9.2
+cocotb_test==0.2.6
+cocotbext-axi==0.1.24
+forastero>=1.2.1
+git
+matplotlib
+mpld3
+numpy
+pytest>=7.3.1
