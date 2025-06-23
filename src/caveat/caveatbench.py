@@ -113,11 +113,6 @@ class CaveatBench():
                 logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
             self.sinks[label] = AxiStreamSink(bus, clk)
 
-    def get_header_from_name(self, name):
-        """Read command packet header from command name
-        """
-        return COMM_PACKET.get(name, None)
-
     async def send_message(self, sender_name, message):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
         """
