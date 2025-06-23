@@ -20,7 +20,7 @@ html_template = """
         <title>CAVEAT Signal Capture</title>
     </head>
     <body>
-        <h1>Captures each signal that does not remain a constant value or contain z values throughout the simulation</h1>
+        <h1>CAVEAT Monitoring for active signals within the Device Under Test </h1>
 
         {plot_divs}
     </body>
