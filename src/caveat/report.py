@@ -19,10 +19,10 @@ html_template = """
     <!DOCTYPE html>
     <html>
     <head>
-        <title>CAVEAT Signal Capture</title>
+        <title>{report_title}</title>
     </head>
     <body>
-        <h1>Captures each signal that does not remain a constant value or contain z values throughout the simulation</h1>
+        <h1>{report_title}</h1>
 
         {plot_divs}
     </body>
@@ -203,12 +203,16 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
             plot_data += mpld3.fig_to_html(fig)
         return plot_data
 
-def make_report(testname: str, cfg_plot: dict, outfilepath: str='../results/dynamic/'):
+def make_report(testname: str, cfg_plot: dict,
+        report_title: str='CAVEAT signal capture',
+        outfilepath: str='../results/dynamic/'):
     """Compile stringified matplotlib figures into HTML report
     """
     #create report
     plot_data = get_html_plot_data(testname, **cfg_plot)
-    html_report = html_template.format(plot_divs = plot_data)
+    html_report = html_template.format(
+                    report_title=report_title,
+                    plot_divs=plot_data)
 
     #write report to file
     outfilesubdir = os.path.split(testname)[0]
