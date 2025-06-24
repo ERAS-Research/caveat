@@ -123,6 +123,15 @@ class CaveatBench():
         outvalue = await receiver.read()
         return outvalue
 
+    def read_message_nowait(self, receiver_name):
+        receiver=self.sinks[receiver_name]
+        try:
+            outvalue = receiver.read_nowait()
+            if outvalue:
+                return outvalue
+        except cocotb.queue.QueueEmpty:
+            return None
+
     async def wait(self, clk, cycle_num=1):
         """Idle DUT for a specified number of clock cycles.
         """
