@@ -39,11 +39,11 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
         plot_data += "AxiStream monitored packets"
         plot_data+="<br>"
         plot_data+="<br>"
-        wavedrom_dict={
-              "config": {
-            "marker_font_size": 6,
-            "name_font_size": 6
-                },
+        # wavedrom_dict={
+        #       "config": {
+        #     "marker_font_size": 6,
+        #     "name_font_size": 6
+        #         },
             "signal":[] }
         datastrings={}
         labels={}
