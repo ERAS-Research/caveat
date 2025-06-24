@@ -123,7 +123,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                 datastring="="
                 for __ in range(len(entry[3])-1):
                     datastring+="."
-                label="header {} bytes payload {} bytes".format(header_size, len(entry[3])-header_size)
+                label="header {} bytes ewewfewfe payload {} bytes".format(header_size, len(entry[3])-header_size)
                 datastrings[signal]+=datastring
                 labels[signal].append(label)
 
