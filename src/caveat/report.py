@@ -39,12 +39,11 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
         plot_data += "AxiStream monitored packets"
         plot_data+="<br>"
         plot_data+="<br>"
-        # wavedrom_dict={
-        #       "config": {
-        #     "marker_font_size": 6,
-        #     "name_font_size": 6
-        #         },
-            "signal":[] }
+        wavedrom_dict={
+            "signal":[],
+             "config": {
+    "hscale": 1.5
+            } }
         datastrings={}
         labels={}
         counters={}
@@ -123,7 +122,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                 datastring="="
                 for __ in range(len(entry[3])-1):
                     datastring+="."
-                label="header {} bytes ewewfewfe payload {} bytes".format(header_size, len(entry[3])-header_size)
+                label="header {} bytes payload {} bytes".format(header_size, len(entry[3])-header_size)
                 datastrings[signal]+=datastring
                 labels[signal].append(label)
 
@@ -141,61 +140,36 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
 
 
 
-
-
-
-
-
-        # for signal in axis_dict:
-
-        #     data_list = axis_dict[signal]
-        #     previous = 0
-        #     downtime_ptr=0
-        #     datastring=""
-        #     datalist=[]
-
-
-
-        #     for datum in data_list:
-        #         data, start, end, period = datum
-        #         if (previous<downtimes[downtime_ptr][0] and start>downtimes[downtime_ptr][1]):
-        #             datastring+="=.|.."
-
-        #             label="idle: {} ns".format(start-previous)
-        #             datalist.append(label)
-        #         header = data[:header_size]
-        #         if (start-previous>0):
-        #             datastring+="=...."
-        #             label="idle: {} ns".format(start-previous)
-        #             datalist.append(label)
-        #         ##this will add a length of 5 to your data
-
-        #         datastring_builder="="
-        #         for __ in range(header_size-1):
-        #             datastring_builder+="."
-        #         label="H"
-        #         datalist.append(label)
-        #         datastring+=datastring_builder
-
-
-        #         if len(data) > header_size:
-        #             datastring_builder="="
-        #             print("data length is ",len(data))
-        #             for __ in range(len(data)-(header_size+1)):
-        #                 datastring_builder += "."
-        #             print("data is", data)
-        #             datastring+=datastring_builder
-        #             label="P"
-        #             datalist.append(label)
-        #         previous = end
-
-
-
-
-
         wavedrom_dict_processed=json.dumps(wavedrom_dict)
         svg=wavedrom.render(wavedrom_dict_processed)
-        plot_data+=svg.tostring()
+        svg=svg.tostring()
+
+
+
+
+        font_sizing = "g[id^='wavelane_draw'] text { font-size: 12px; }"
+        svg = svg.replace("</style>", f"{font_sizing}</style>")
+        svg = svg.replace('height="60"', 'height="400"')
+        svg = svg.replace('width="1220"', 'width="1600"')
+        svg = svg.replace('viewBox="0,0,1220,60"', 'viewBox="0 0 1600 400"')
+        svg = svg.replace('<svg ', '<svg id="waveform" ')
+        plot_data+='<div style="width: 1600px; height: 400px; overflow: scroll;">'
+        plot_data+=svg
+        plot_data+="</div>"
+        plot_data+="""
+            <script src="https://unpkg.com/svg-pan-zoom@latest/dist/svg-pan-zoom.min.js"></script>
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                svgPanZoom('#waveform', {
+                    zoomEnabled: true,
+                    controlIconsEnabled: true,
+                    fit: true,
+                    center: true,
+                    contain: true
+                });
+            });
+            </script>
+            """
         plot_data+="<br>"
 
     if data_dict:
