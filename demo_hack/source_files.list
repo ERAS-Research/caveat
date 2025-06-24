@@ -1,4 +1,0 @@
-$(SANIMUT_FPGA_SOURCEDIR)/sys_core.v
-$(SANIMUT_FPGA_SOURCEDIR)/trxpc1_core.v
-def_sanimut_deployment_configuration.vh
-$(SANIMUT_FPGA_SOURCEDIR)/../../../ip_repo/verilog-ethernet/lib/axis/rtl/axis_fifo.v
