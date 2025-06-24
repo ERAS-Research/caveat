@@ -98,22 +98,34 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                     counters[signal]=entry[0]
 
 
+                #version of code which separates header and payload
+
+                # datastring="="
+                # for __ in range(header_size-1):
+                #     datastring+="."
+                # datastrings[signal]+=datastring
+                # labels[signal].append("H")
+                # if len(entry[3]) > header_size:
+                #     datastring_builder="="
+                #     print("data length is ",len(entry[3]))
+                #     for __ in range(len(entry[3])-(header_size+1)):
+                #         datastring_builder += "."
+                #     print("data is", entry[3])
+                #     datastrings[signal]+=datastring_builder
+                #     label="P"
+                #     labels[signal].append(label)
+
                 datastring="="
-                for __ in range(header_size-1):
+                for __ in range(len(entry[3])-1):
                     datastring+="."
-
+                label="header {} bytes payload {} bytes".format(header_size, len(entry[3])-header_size)
                 datastrings[signal]+=datastring
-                labels[signal].append("H")
+                labels[signal].append(label)
 
-                if len(entry[3]) > header_size:
-                    datastring_builder="="
-                    print("data length is ",len(entry[3]))
-                    for __ in range(len(entry[3])-(header_size+1)):
-                        datastring_builder += "."
-                    print("data is", entry[3])
-                    datastrings[signal]+=datastring_builder
-                    label="P"
-                    labels[signal].append(label)
+
+
+
+
                 counters[signal]=entry[1]
                 print("hit end of uptime, counter at", counters[signal])
         for signal in axis_dict:
