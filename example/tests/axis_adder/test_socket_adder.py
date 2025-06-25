@@ -1,43 +1,27 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2025 ERAS Research Group and sanimut Development Team
-# Author(s): Torsten Reuschel
+# Author(s): Murray Ferris
 
 """
-Start sanimut cocotb-based emulator with communication interface via socket
+Adder which takes in values from a netowork socket and sends back the resulting sum
 """
 
-import numpy as np
-import os
+
+
 import cocotb
 from cocotb.clock import Clock
-from cocotb.queue import Queue
-from cocotb.triggers import RisingEdge
 from cocotb_test.simulator import run
-from cocotbext.axi import (AxiStreamBus, AxiStreamSource, AxiStreamSink)
-from cocotb.binary import BinaryValue
-import logging
-import sys
+
+
 import socket
-logger = logging.getLogger(__name__)
 
 
-
-
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/'))
-if module_path not in sys.path:
-    sys.path.append(module_path)
-from caveat.caveatbench import CaveatBench
-from caveat.augmented_handle import create_interface_socket_to_axis
 from cocotb.triggers import Edge
-from caveat import physical
+
 
 @cocotb.test()
 async def ethernet_adder(dut):
-
-
-
-
 
     remote_address = "127.0.0.1"
     remote_port = 20000
@@ -45,16 +29,14 @@ async def ethernet_adder(dut):
     caveat_socket=socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     caveat_socket.bind(('', local_port))
     caveat_socket.settimeout(0)
-    stop=False
     buffer_size = 8192
     clock_name = "clk"
     clock = getattr(dut, clock_name)
     period = 10
-
     cocotb.start_soon(Clock(clock, period, units="ns").start())
 
 
-    #start emulator
+
     while True:
         try:
             message = caveat_socket.recv(buffer_size)
@@ -73,8 +55,6 @@ async def ethernet_adder(dut):
             if dut.result.value != 0:
                 dut.result.value = 0
                 await Edge (dut.result)
-
-
         except:
             pass
 

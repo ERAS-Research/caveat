@@ -1,28 +1,17 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2025 ERAS Research Group and sanimut Development Team
-# Author(s): Torsten Reuschel
+# Author(s): Murray Ferris
 
 """
-Start sanimut cocotb-based emulator with communication interface via socket
+Example of using a socket to connect to program on a local network to perform addition
 """
 
 
-import os
-import cocotb
 
-import logging
-import sys
-import threading
-import time
+
 import socket
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/'))
-if module_path not in sys.path:
-    sys.path.append(module_path)
-from caveat.caveatbench import CaveatBench
-from caveat.augmented_handle import create_interface_socket_to_axis
-from caveat import physical
-
+import time
 
 
 
