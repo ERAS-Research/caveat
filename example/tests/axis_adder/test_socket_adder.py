@@ -11,13 +11,11 @@ Adder which takes in values from a netowork socket and sends back the resulting 
 
 import cocotb
 from cocotb.clock import Clock
+from cocotb.triggers import Edge
 from cocotb_test.simulator import run
-
-
 import socket
 
 
-from cocotb.triggers import Edge
 
 
 @cocotb.test()
@@ -26,7 +24,7 @@ async def ethernet_adder(dut):
     remote_address = "127.0.0.1"
     remote_port = 20000
     local_port = 20002
-    caveat_socket=socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+    caveat_socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     caveat_socket.bind(('', local_port))
     caveat_socket.settimeout(0)
     buffer_size = 8192
@@ -42,12 +40,12 @@ async def ethernet_adder(dut):
             message = caveat_socket.recv(buffer_size)
             print("Received from socket: ", list(message), flush=True)
             message=list(message)
-            if message==[100,100]:
+            if message == [100, 100]:
                 caveat_socket.close()
                 break
-            dut.value_a.value= message[0]
+            dut.value_a.value = message[0]
             dut.value_b.value = message[1]
-            if not (message[0]==0 and message[1]==0):
+            if not (message[0] == 0 and message[1] == 0):
                 await Edge(dut.result)
             output = int(dut.result.value)
             output=[output]
