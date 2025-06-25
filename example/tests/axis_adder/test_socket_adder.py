@@ -42,14 +42,11 @@ async def ethernet_adder(dut):
     remote_address = "127.0.0.1"
     remote_port = 20000
     local_port = 20002
-
-
     caveat_socket=socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
     caveat_socket.bind(('', local_port))
     caveat_socket.settimeout(0)
     stop=False
     buffer_size = 8192
-
     clock_name = "clk"
     clock = getattr(dut, clock_name)
     period = 10
@@ -57,23 +54,21 @@ async def ethernet_adder(dut):
     cocotb.start_soon(Clock(clock, period, units="ns").start())
 
 
-
-    #start emulator
-
     #start emulator
     while True:
         try:
             message = caveat_socket.recv(buffer_size)
-            print('SOCK>DEV', list(message), flush=True)
+            print("Received from socket: ", list(message), flush=True)
             message=list(message)
+            if message==[100,100]:
+                caveat_socket.close()
+                break
             dut.value_a.value= message[0]
             dut.value_b.value = message[1]
             if not (message[0]==0 and message[1]==0):
                 await Edge(dut.result)
-            print("output is", dut.result.value)
             output = int(dut.result.value)
             output=[output]
-            print("output is", output)
             caveat_socket.sendto(bytearray(output), (remote_address, remote_port))
             if dut.result.value != 0:
                 dut.result.value = 0
@@ -82,29 +77,6 @@ async def ethernet_adder(dut):
 
         except:
             pass
-        #     try:
-        #         message = [int(xx) for xx in input]
-        #         caveat_socket.sendto(bytearray(message), (remote_address, remote_port))
-        #         print("waiting for response...")
-        #         start=time.time()
-        #         while True:
-        #             current=time.time()
-        #             if current-start>5:
-        #                 print("timeout")
-        #                 received=None
-
-        #             except:
-        #                 pass
-        #     except ValueError:
-        #         print("need to print two space separated integers")
-
-        # else:
-        #     print("length needs to be exactly two")
-        #     pass
-
-    #clean up
-    #FIXME: never reaching this, if receiving SIGINT or SIGTERM; this should be triggered through an independent process
-
 
 def test_ethernet_adder():
     """pytest wrapper to capture test results from cocotb_test runner
