@@ -43,6 +43,7 @@ module axis_adder_toplevel #(
     parameter ID_ENABLE            = 0,
     parameter ID_WIDTH             = 8,
     parameter DEST_ENABLE          = 0,
+    parameter DEST_WIDTH           = 8,
     parameter USER_WIDTH           = 1,
     parameter PIPELINE_OUTPUT      = 2,
     parameter FRAME_FIFO           = 0,
@@ -112,6 +113,7 @@ axis_fifo #(
         .ID_ENABLE            (ID_ENABLE),
         .ID_WIDTH             (ID_WIDTH),
         .DEST_ENABLE          (DEST_ENABLE),
+        .DEST_WIDTH	      (DEST_WIDTH),
         .USER_WIDTH           (USER_WIDTH),
         .PIPELINE_OUTPUT      (PIPELINE_OUTPUT),
         .FRAME_FIFO           (FRAME_FIFO),
@@ -119,12 +121,12 @@ axis_fifo #(
         .USER_BAD_FRAME_MASK  (USER_BAD_FRAME_MASK),
         .DROP_OVERSIZE_FRAME  (DROP_OVERSIZE_FRAME),
         .DROP_BAD_FRAME       (DROP_BAD_FRAME),
-        .DROP_WHEN_FULL       (DROP_WHEN_FULL),
+        .DROP_WHEN_FULL       (DROP_WHEN_FULL)
   
 ) axis_fifo_inst (
   //input
   .s_axis_tdata(s_axis_tdata),
-  .s_axis_tkeep(s_axis_tkeep,
+  .s_axis_tkeep(s_axis_tkeep),
   .s_axis_tvalid(s_axis_tvalid),
   .s_axis_tready(s_axis_tready),
   .s_axis_tlast(s_axis_tlast),
@@ -145,19 +147,19 @@ axis_fifo #(
   //status outputs
   .status_overflow  (status_overflow),
   .status_bad_frame (status_bad_frame),
-  .status_good_frame(status_good_frame),
+  .status_good_frame(status_good_frame)
 
 );
 
 adder #(
-      .DEPTH                (DEPTH),
+      .c_WIDTH                (c_WIDTH)
       
       
-) adder_inst {
+) adder_inst (
   .clk(clk),
   .value_a(value_a),
   .value_b(value_b),
-  .result(result),
+  .result(result)
 );
 
 endmodule
