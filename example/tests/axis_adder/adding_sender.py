@@ -38,7 +38,7 @@ while True:
             start=time.time()
             while True:
                 current = time.time()
-                if current - start>1:
+                if current - start>5:
                     print("timeout. Numbers may be beyond selected bitwidth (default is (2^4)-1 = 15)")
                     received = None
                     break
