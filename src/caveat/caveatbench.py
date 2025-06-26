@@ -124,14 +124,14 @@ class CaveatBench():
         self.sources[sender_name].send_nowait(bytes(message))
 
     async def read_message(self, receiver_name):
-        """Read value out from specified receiver, returning an integer list
+        """Read value out from specified receiver, returns list of integers
         """
         receiver=self.sinks[receiver_name]
         outvalue = await receiver.read()
         return outvalue
 
     def read_message_nowait(self, receiver_name):
-        """Read value out from specified receiver, returning an integer list
+        """Read value out from specified receiver, returns list of integers
         """
         return self.sinks[receiver_name].read_nowait()
 
@@ -164,7 +164,7 @@ class CaveatBench():
 
         make_report(testname, cfg_plot=cfg_plot)
 
-    async def init_monitor(self, signal_name, clk, callback= lambda x:x):
+    async def init_monitor(self, signal_name, clk, callback= lambda x: x):
         """Create and start a monitor for a specific signal
         """
         signal = getattr(self.dut, signal_name)
