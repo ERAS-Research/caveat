@@ -56,7 +56,7 @@ class CaveatBench():
         self._config = dict()
 
     async def add_sender_axis(self, label: str, clk, prefix: str='',
-            signals: dict={}, verbosity_level=logging.WARNING):
+            signals: dict={}, verbosity_level=logging.WARNING, byte_width=8):
         """Add AXI-Stream interface capable of sending data to the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
         or a dictionary of signals following the pattern
@@ -72,7 +72,7 @@ class CaveatBench():
         if not signals:
             self.sources[label] = AxiStreamSource(
                 AxiStreamBus.from_prefix(self.dut, prefix),
-                clk)
+                clk, byte_size=byte_width)
             #configure logging
             logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
         else:
@@ -81,10 +81,10 @@ class CaveatBench():
                 bus._add_signal(key, prefix + value)
                 #configure logging
                 logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
-            self.sources[label] = AxiStreamSource(bus, clk)
+            self.sources[label] = AxiStreamSource(bus, clk, byte_size=byte_width)
 
     async def add_receiver_axis(self, label: str, clk, prefix: str='',
-            signals: dict={}, verbosity_level=logging.WARNING):
+            signals: dict={}, verbosity_level=logging.WARNING, byte_width=8):
         """Add AXI-Stream interface capable of receiving data from the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
         or a dictionary of signals following the pattern
@@ -100,7 +100,7 @@ class CaveatBench():
         if not signals:
             self.sinks[label] = AxiStreamSink(
                                     AxiStreamBus.from_prefix(self.dut, prefix),
-                                    clk)
+                                    clk, byte_size=byte_width)
             #configure logging
             logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
         else:
@@ -109,7 +109,7 @@ class CaveatBench():
                 bus._add_signal(key, prefix + value)
                 #configure logging
                 logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
-            self.sinks[label] = AxiStreamSink(bus, clk)
+            self.sinks[label] = AxiStreamSink(bus, clk, byte_size=byte_width)
 
     async def send_message(self, sender_name, message):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
@@ -122,6 +122,11 @@ class CaveatBench():
         receiver=self.sinks[receiver_name]
         outvalue = await receiver.read()
         return outvalue
+
+    def read_message_nowait(self, receiver_name):
+        """Read value out from specified receiver, returning an integer list
+        """
+        return self.sinks[receiver_name].read_nowait()
 
     async def wait(self, clk, cycle_num=1):
         """Idle DUT for a specified number of clock cycles.
@@ -150,10 +155,15 @@ class CaveatBench():
 
         make_report(testname, cfg_plot=cfg_plot)
 
-    async def init_monitor(self, signal_name, clk):
+    async def init_monitor(self, signal_name, clk, monitor_name=None, little_endian=False):
         """Create and start a monitor for a specific signal
         """
+
+
         signal = getattr(self.dut, signal_name)
+        if monitor_name is not None:
+            signal_name=monitor_name
         self.handle_dict[signal_name] = [signal.value]
-        self.monitor_list[signal_name] = CaveatMonitor(signal=signal)
+        print("for monitor", signal_name, "little endian is", little_endian)
+        self.monitor_list[signal_name] = CaveatMonitor(signal=signal, little_endian=little_endian)
         self.monitor_list[signal_name].start()
