@@ -57,7 +57,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
             for datum in data_list:
                 data, start, end, period = datum
                 uptimes.append([int(start), int(end), signal, data, int(period)])
-        ## now to sort, shouldnt't matter which i sort by for overlap but I'll sort by start time to ensure that 0 time entries are first
 
         uptimes.sort(key=lambda x: x[0])
 
