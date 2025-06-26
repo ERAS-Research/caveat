@@ -13,11 +13,11 @@ class CaveatMonitor(Monitor):
     """CaveatMonitor inherits from cocotb_bus and defines _capture() to
     process monitored signals. Used for dedicated capturing.
     """
-    def __init__(self, signal: SimHandleBase):
+    def __init__(self, signal: SimHandleBase, little_endian=False):
         self._values = Queue()
         self._signal = signal
         self._coroutine = None
-
+        self.little_endian=little_endian
     def start(self):
         """Start monitor
         """
@@ -29,8 +29,16 @@ class CaveatMonitor(Monitor):
         while True:
             await Edge(self._signal)
             try:
-                self._values.put_nowait(self._capture(str(int(self._signal.value))))
-            except:
+                data=self._capture(str(int(self._signal.value)))
+                data=list(data)
+                val= self._signal.value
+                print("val before", val, "type:", type(val))
+                print("self little endian:" , self.little_endian)
+                if self.little_endian == True:
+                    data[1]=int.from_bytes(int(val).to_bytes(int(len(val)/8), byteorder='big'), byteorder='little')
+                    print("val after:", data[1])
+                self._values.put_nowait(data)
+            except ValueError:
                 self._values.put_nowait(self._capture(str(self._signal.value)))
 
     def _capture(self, value):
