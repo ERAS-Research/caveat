@@ -7,8 +7,6 @@
 Adder which takes in values from a netowork socket and sends back the resulting sum
 """
 
-
-
 import cocotb
 from cocotb.clock import Clock
 from cocotb.triggers import Edge
@@ -16,11 +14,8 @@ from cocotb_test.simulator import run
 import socket
 
 
-
-
 @cocotb.test()
 async def ethernet_adder(dut):
-
     remote_address = "127.0.0.1"
     remote_port = 20000
     local_port = 20002
@@ -33,13 +28,11 @@ async def ethernet_adder(dut):
     period = 10
     cocotb.start_soon(Clock(clock, period, units="ns").start())
 
-
-
     while True:
         try:
             message = caveat_socket.recv(buffer_size)
             print("Received from socket: ", list(message), flush=True)
-            message=list(message)
+            message = list(message)
             if message == [100, 100]:
                 caveat_socket.close()
                 break
@@ -68,5 +61,4 @@ def test_ethernet_adder():
         extra_env = {
             'COCOTB_ANSI_OUTPUT':'1', #colorful output to terminal
             },
-        seed = int(0),
     )

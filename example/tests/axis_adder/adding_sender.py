@@ -35,7 +35,7 @@ while True:
                 print("shutdown engaged")
                 break
             print("waiting for response...")
-            start=time.time()
+            start = time.time()
             while True:
                 current = time.time()
                 if current - start>5:

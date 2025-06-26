@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # Copyright (C) 2025 ERAS Research Group and sanimut Development Team
-# Author(s): Torsten Reuschel
+# Author(s): Murray Ferris, Torsten Reuschel
 
 """
 Start sanimut cocotb-based emulator with communication interface via socket
@@ -29,9 +29,8 @@ def splitter(interface_in):
 
 @cocotb.test()
 async def run_network_adder(dut):
-    # generate a clock
     cocotb.start_soon(Clock(dut.clk, 8, units="ns").start())
-    tb_env=CaveatBench(dut)
+    tb_env = CaveatBench(dut)
     await tb_env.init_monitor("s_axis_tdata", "clk", callback=splitter)
     await tb_env.init_monitor("m_axis_tdata", "clk")
 
@@ -43,7 +42,6 @@ async def run_network_adder(dut):
         axis_bus_module_input = "s_axis",
         axis_bus_module_output = "m_axis")
 
-
     #start emulator
     try:
         while True:
@@ -54,15 +52,11 @@ async def run_network_adder(dut):
         tb_env.generate_plot()
 
 
-
-
 if __name__ == "__main__":
-
     run(module = "run_network_adder",
-        verilog_sources = [ 'rtl/axis_adder_toplevel.v', ],
+        verilog_sources = ['rtl/axis_adder_toplevel.v'],
         toplevel = "axis_adder_toplevel",
         sim_build = 'build/sim_build/',
         timescale  = "1ns/1ps",
         force_compile = True,     #force recompile,
-
     )
