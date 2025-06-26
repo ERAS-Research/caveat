@@ -65,11 +65,9 @@ class CaveatAxiStreamMonitor(AxiStreamMonitor):
         while True:
             await RisingEdge(self.clock)
 
-
             if self.bus.tvalid.value and self.bus.tready.value:
                 if len(tdata) == 0:
                     self.start_time = get_sim_time('ns')
-
 
                 ##since tlast is necessary may be worth forcing it the same way tdata is
                 tdata.append(int(self.bus.tdata.value))
@@ -81,13 +79,10 @@ class CaveatAxiStreamMonitor(AxiStreamMonitor):
 
                 if tlast[-1] == 1:
                     end_time = get_sim_time('ns')
-
-                    data=tdata.copy()#necessary to avoid data being overwritten
+                    data = tdata.copy()
                     clock_period = (end_time-self.start_time)/(len(tdata)-1)
-                    framedata = [data,self.start_time-clock_period,end_time, clock_period]
-
+                    framedata = [data, self.start_time-clock_period,end_time, clock_period]
                     self.frame_buffer.append(framedata)
-
                     #cleanup
                     tdata.clear()
                     tuser.clear()

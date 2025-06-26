@@ -151,7 +151,7 @@ class CaveatBench():
             self.handle_dict[monitor_name] = list(mon._values._queue)
 
         for monitor_name, mon in self.monitors.items():
-            self.axis_dict[monitor_name]=list(mon.frame_buffer)
+            self.axis_dict[monitor_name] = list(mon.frame_buffer)
         cfg_plot = {}
         cfg_plot['data_dict'] = self.handle_dict
         cfg_plot['axis_dict'] = self.axis_dict
