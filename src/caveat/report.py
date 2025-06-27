@@ -162,7 +162,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                 if ('z' in str(xx)) or ('x' in str(xx)):
                     dx[ii] = [float('nan')] * len(dx[ii])
                 else:
-                    if isinstance(dx[ii], str):
+                    if isinstance(dx[ii], str) or isinstance(dx[ii], int):
                         dx[ii] = float(xx)
                     else:
                         dx[ii] = [float(xx) for xx in dx[ii]]
