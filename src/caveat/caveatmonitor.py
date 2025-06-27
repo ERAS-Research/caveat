@@ -14,10 +14,11 @@ class CaveatMonitor(Monitor):
     """CaveatMonitor inherits from cocotb_bus and defines _capture() to
     process monitored signals. Used for dedicated capturing.
     """
-    def __init__(self, signal: SimHandleBase):
+    def __init__(self, signal: SimHandleBase, callback= lambda x: x):
         self._values = Queue()
         self._signal = signal
         self._coroutine = None
+        self._callback = callback
 
     def start(self):
         """Start monitor
@@ -40,7 +41,7 @@ class CaveatMonitor(Monitor):
         then appends the new value.
         """
         current_time = int(get_sim_time(units='ns'))
-        return (current_time, value)
+        return (current_time, self._callback(value))
 
 
 class CaveatAxiStreamMonitor(AxiStreamMonitor):
@@ -64,24 +65,22 @@ class CaveatAxiStreamMonitor(AxiStreamMonitor):
 
         while True:
             await RisingEdge(self.clock)
-
+            # detect and capture AXIS transfer
             if self.bus.tvalid.value and self.bus.tready.value:
-                if len(tdata) == 0:
+                if not tdata:
                     self.start_time = get_sim_time('ns')
-
-                ##since tlast is necessary may be worth forcing it the same way tdata is
                 tdata.append(int(self.bus.tdata.value))
                 tlast.append(int(self.bus.tlast.value) if hasattr(self.bus, 'tlast') else 0)
                 tuser.append(int(self.bus.tuser.value) if hasattr(self.bus, 'tuser') else 0)
                 tkeep.append(int(self.bus.tkeep.value) if hasattr(self.bus, 'tkeep') else 0)
                 tid.append(int(self.bus.tid.value) if hasattr(self.bus, 'tid') else 0)
                 tdest.append(int(self.bus.tdest.value) if hasattr(self.bus, 'tdest') else 0)
-
+                # end of frame
                 if tlast[-1] == 1:
                     end_time = get_sim_time('ns')
                     data = tdata.copy()
-                    clock_period = (end_time-self.start_time)/(len(tdata)-1)
-                    framedata = [data, self.start_time-clock_period,end_time, clock_period]
+                    clock_period = (end_time - self.start_time) / (len(tdata) - 1)
+                    framedata = [data, self.start_time-clock_period, end_time, clock_period]
                     self.frame_buffer.append(framedata)
                     #cleanup
                     tdata.clear()
