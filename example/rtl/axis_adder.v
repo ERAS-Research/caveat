@@ -7,12 +7,12 @@ module axis_adder #(
   input wire rst,
 
   input  wire [2*c_WIDTH-1:0] s_axis_tdata,
-  input  wire                    s_axis_tvalid,
-  output reg                     s_axis_tready= 1,
+  input  wire                 s_axis_tvalid,
+  output reg                  s_axis_tready= 1,
 
-  output reg [c_WIDTH-1:0]  m_axis_tdata,
-  output reg                   m_axis_tvalid = 0,
-  input  wire                  m_axis_tready
+  output reg [2*c_WIDTH-1:0] m_axis_tdata,
+  output reg                 m_axis_tvalid = 0,
+  input  wire                m_axis_tready
 );
 
 always @(posedge clk) begin
