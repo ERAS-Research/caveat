@@ -165,9 +165,8 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                     dx[ii] = float(xx)
             #plot data
 
-            print("dT:", dt)
+
             dt=[reverse_lookup_dt(xx, global_t) for xx in dt]
-            print('DT IS', dt)
             fig.add_trace(
             # go.Scatter(x=[reverse_lookup_dt(xx, global_t) for xx in dt], y=dx), row=dict_index+1, col=1)
             # hop = len(global_t)//
@@ -180,7 +179,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
         # ax[-1].set_xticklabels([str(xx) for xx in global_t])
         fig.update_layout(height=200*len(data_dict), title_text="CAVEAT")
         plot_data += fig.to_html()
-        print(len)
         return plot_data
 
 
