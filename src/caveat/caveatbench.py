@@ -118,7 +118,7 @@ class CaveatBench():
     async def send_message(self, sender_name, message):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
         """
-        self.sources[sender_name].send_nowait(bytes(message))
+        self.sources[sender_name].send_nowait(list(message))
 
     async def read_message(self, receiver_name):
         """Read value out from specified receiver, returns list of integers
