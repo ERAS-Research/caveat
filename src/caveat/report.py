@@ -137,10 +137,10 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
             dx = list(dx)
             for ii, xx in enumerate(dx):
                 if ('z' in str(xx)) or ('x' in str(xx)):
-                    dx[ii] = [float('nan')]*len(dx[ii])
+                    dx[ii] = [float('nan')] * len(dx[ii])
                 else:
                     if isinstance(dx[ii], str):
-                        dx[ii]=float(xx)
+                        dx[ii] = float(xx)
                     else:
                         dx[ii] = [float(xx) for xx in dx[ii]]
             #plot data
