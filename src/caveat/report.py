@@ -162,13 +162,12 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                 if ('z' in str(xx)) or ('x' in str(xx)):
                     dx  += [float('nan') * len(dx[ii])]
                 else:
-                    if isinstance(dx[ii], str) or isinstance(dx[ii], int) or isinstance(dx[ii], float):
-                        dx[ii] = float(xx)
-                    else:
+                    if isinstance(dx[ii], list):
                         dx[ii] = [float(xx) for xx in dx[ii]]
-            #plot data
+                    else:
+                        dx[ii] = float(xx)
 
-            print(key, dx)
+            #plot data
             dt=[reverse_lookup_dt(xx, global_t) for xx in dt]
             fig.add_trace(
             # go.Scatter(x=[reverse_lookup_dt(xx, global_t) for xx in dt], y=dx), row=dict_index+1, col=1)
