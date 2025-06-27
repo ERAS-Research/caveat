@@ -1,4 +1,5 @@
 `default_nettype none
+
 module adder #(
   parameter c_WIDTH = 4
 ) (

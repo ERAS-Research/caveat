@@ -4,7 +4,8 @@
 # Author(s): Murray Ferris
 
 """
-Example of using a socket to connect to program on a local network to perform addition
+Example of using a socket to interact with network socket, e.g. send integers to
+emulator and receive their sum
 """
 
 import socket
@@ -13,45 +14,31 @@ import time
 remote_address = "127.0.0.1"
 remote_port = 20002
 local_port = 20000
+sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+sock.bind(('', local_port))
+sock.settimeout(0)
 
-caveat_socket=socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-caveat_socket.bind(('', local_port))
-caveat_socket.settimeout(0)
-stop=False
-buffer_size = 8192
-
-print("adder over socket demonstration. print two numbers to add in the socket_adder test. send 100 100 to shut down both programs")
-#start looping program
+print("User interface for 'adder over network' example. Enter two integers and press enter to add. Send 255 255 to shut down.")
 while True:
-    messageinput = None
-    message = input("numbers to add:")
-    message = message.strip().split()
-    received = None
-    if len(message) == 2:
+    req = input('Enter two integers to add: ')
+    req = req.strip().split()
+    if not (len(req) == 2):
+        req = [int(req[0]), 0]
+    req = [int(rr) for rr in req]
+    print('Requesting', ' + '.join([str(rr) for rr in req]))
+    sock.sendto(bytearray(req), (remote_address, remote_port))
+    if req == [255, 255]:
+        print("Shutting down..")
+        break
+
+    start = time.time()
+    while True:
+        if (time.time() - start) > 5:
+            print('Timeout... please try again')
+            break
         try:
-            message = [int(xx) for xx in message]
-            caveat_socket.sendto(bytearray(message), (remote_address, remote_port))
-            if message == [100, 100]:
-                print("shutdown engaged")
-                break
-            print("waiting for response...")
-            start = time.time()
-            while True:
-                current = time.time()
-                if current - start>5:
-                    print("timeout. Numbers may be beyond selected bitwidth (default is (2^4)-1 = 15)")
-                    received = None
-                    break
-                try:
-                    message = caveat_socket.recv(buffer_size)
-                    print('Received sum:', list(message)[0], flush=True)
-                    break
-                except:
-                    pass
-        except ValueError:
-            print("need to print two space separated integers")
-    else:
-        print("length needs to be exactly two")
-        pass
-
-
+            message = sock.recv(8192)
+            print('Received sum:', list(message)[0], flush=True)
+            break
+        except:
+            pass
