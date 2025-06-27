@@ -33,11 +33,8 @@ class CaveatMonitor(Monitor):
                 data=self._capture(str(int(self._signal.value)))
                 data=list(data)
                 val= self._signal.value
-                print("val before", val, "type:", type(val))
-                print("self little endian:" , self.little_endian)
                 if self.little_endian == True:
                     data[1]=int.from_bytes(int(val).to_bytes(int(len(val)/8), byteorder='big'), byteorder='little')
-                    print("val after:", data[1])
                 self._values.put_nowait(data)
             except ValueError:
                 self._values.put_nowait(self._capture(str(self._signal.value)))
