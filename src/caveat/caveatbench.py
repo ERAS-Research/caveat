@@ -118,6 +118,7 @@ class CaveatBench():
             self.sinks[label] = AxiStreamSink(bus, clk)
         if monitor:
             self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
+
     async def send_message(self, sender_name, message):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
         """
