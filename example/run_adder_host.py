@@ -45,13 +45,13 @@ async def run_network_adder(dut):
     #start emulator
     try:
         while True:
-            # await RisingEdge(dut.clk)
+            await RisingEdge(dut.clk)
             #exit on magic number
-            # if dut.s_axis_tdata.value == 65535:
+            if dut.s_axis_tdata.value == 65535:
             # if dut.m_axis_tvalid.value:
-            for _ in range(400000):
-                await RisingEdge(dut.clk)
-            break
+                for _ in range(100):
+                    await RisingEdge(dut.clk)
+                break
     finally:
         dut._if_socket_handle.stop = True
         dut._if_socket_handle.communication_stop()
@@ -59,7 +59,7 @@ async def run_network_adder(dut):
 
 
 if __name__ == "__main__":
-    run(module = "run_network_adder",
+    run(module = "run_adder_host",
         verilog_sources = ['rtl/axis_adder.v'],
         toplevel = "axis_adder",
         sim_build = 'build/sim_build/',
