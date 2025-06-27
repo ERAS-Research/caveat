@@ -179,8 +179,14 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
         # plt.xlabel("Time (ns)")
         # plt.show()
         # ax[-1].set_xticklabels([str(xx) for xx in global_t])
-        fig.update_layout(height=200*len(data_dict), title_text="CAVEAT")
+        fig.update_layout(height=200*len(data_dict), title_text="CAVEAT- Dynamic Test Reporting")
         plot_data += fig.to_html()
+        outfilepath = '../results/dynamic/'
+        outfilesubdir = os.path.split(testname)[0]
+        Path(os.path.join(outfilepath, outfilesubdir)).mkdir(parents=True, exist_ok=True)
+
+        fig.write_image(outfilepath+testname+".pdf")
+
         return plot_data
 
 
