@@ -128,11 +128,8 @@ class CaveatBench():
         return outvalue
 
     def read_message_nowait(self, receiver_name):
-<<<<<<< HEAD
-        """Read value out from specified receiver, returning an integer list
-=======
+
         """Read value out from specified receiver, returns list of integers
->>>>>>> dev
         """
         return self.sinks[receiver_name].read_nowait()
 
@@ -165,11 +162,7 @@ class CaveatBench():
 
         make_report(testname, cfg_plot=cfg_plot)
 
-<<<<<<< HEAD
-    async def init_monitor(self, signal_name, clk, monitor_name=None, little_endian=False):
-=======
-    async def init_monitor(self, signal_name, clk, callback= lambda x: x):
->>>>>>> dev
+    async def init_monitor(self, signal_name, clk, monitor_name=None, little_endian=False, callback= lambda x: x):
         """Create and start a monitor for a specific signal
         """
 
@@ -178,10 +171,5 @@ class CaveatBench():
         if monitor_name is not None:
             signal_name=monitor_name
         self.handle_dict[signal_name] = [signal.value]
-<<<<<<< HEAD
-        print("for monitor", signal_name, "little endian is", little_endian)
-        self.monitor_list[signal_name] = CaveatMonitor(signal=signal, little_endian=little_endian)
-=======
-        self.monitor_list[signal_name] = CaveatMonitor(signal=signal, callback=callback)
->>>>>>> dev
+        self.monitor_list[signal_name] = CaveatMonitor(signal=signal, little_endian=little_endian, callback=callback)
         self.monitor_list[signal_name].start()
