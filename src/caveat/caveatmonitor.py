@@ -5,8 +5,9 @@ import cocotb
 from cocotb.handle import SimHandleBase
 from cocotb.queue import Queue
 from cocotb.utils import get_sim_time
-from cocotb.triggers import Edge
+from cocotb.triggers import Edge, RisingEdge
 from cocotb_bus.monitors import Monitor
+from cocotbext.axi import AxiStreamMonitor
 
 
 class CaveatMonitor(Monitor):
@@ -48,3 +49,52 @@ class CaveatMonitor(Monitor):
         """
         current_time = int(get_sim_time(units='ns'))
         return (current_time, value)
+
+
+class CaveatAxiStreamMonitor(AxiStreamMonitor):
+    """overrides some functionality of the basic axistreammonitor to alow
+    for a start time to be included in the data frame, as well as avoiding
+    actually using the frame as the primary data transmitter.
+    Realistically, this could be rewritten to be proprietary
+    """
+    def __init__(self, bus, clock, callback=None):
+        super().__init__(bus, clock)
+        self._current_start_time = None
+        self.frame_buffer=[]
+
+    async def _run(self):
+        tdata = []
+        tuser = []
+        tlast = []
+        tkeep = []
+        tid = []
+        tdest = []
+
+        while True:
+            await RisingEdge(self.clock)
+
+            if self.bus.tvalid.value and self.bus.tready.value:
+                if len(tdata) == 0:
+                    self.start_time = get_sim_time('ns')
+
+                ##since tlast is necessary may be worth forcing it the same way tdata is
+                tdata.append(int(self.bus.tdata.value))
+                tlast.append(int(self.bus.tlast.value) if hasattr(self.bus, 'tlast') else 0)
+                tuser.append(int(self.bus.tuser.value) if hasattr(self.bus, 'tuser') else 0)
+                tkeep.append(int(self.bus.tkeep.value) if hasattr(self.bus, 'tkeep') else 0)
+                tid.append(int(self.bus.tid.value) if hasattr(self.bus, 'tid') else 0)
+                tdest.append(int(self.bus.tdest.value) if hasattr(self.bus, 'tdest') else 0)
+
+                if tlast[-1] == 1:
+                    end_time = get_sim_time('ns')
+                    data = tdata.copy()
+                    clock_period = (end_time-self.start_time)/(len(tdata)-1)
+                    framedata = [data, self.start_time-clock_period,end_time, clock_period]
+                    self.frame_buffer.append(framedata)
+                    #cleanup
+                    tdata.clear()
+                    tuser.clear()
+                    tlast.clear()
+                    tkeep.clear()
+                    tid.clear()
+                    tdest.clear()
