@@ -132,9 +132,10 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
     if data_dict:
 
 
-        fig= make_subplots(rows=len(data_dict), cols=1)
+        fig= make_subplots(rows=len(data_dict), cols=1, shared_xaxes=True)
+        fig.update_layout(showlegend=False)
 
-
+        annotations=[]
         dict_index=0
         global_t=[]
         for key, data in data_dict.items():
@@ -168,18 +169,43 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                         dx[ii] = float(xx)
 
             #plot data
-            dt=[reverse_lookup_dt(xx, global_t) for xx in dt]
-            fig.add_trace(
-            # go.Scatter(x=[reverse_lookup_dt(xx, global_t) for xx in dt], y=dx), row=dict_index+1, col=1)
-            # hop = len(global_t)//
-             go.Scatter(x=dt, y=dx, mode='lines', line_shape='hv', name=key), row=dict_index+1, col=1, )
-            # ax[dict_index].set_xticks(range(len(global_t))[::hop], global_t[::hop])
-            # plot_data += key
-            dict_index+=1
+
+            # dt=[reverse_lookup_dt(xx, global_t) for xx in dt]
+
+            if not any(isinstance(item, list) for item in dx):
+                fig.add_trace(
+                # go.Scatter(x=[reverse_lookup_dt(xx, global_t) for xx in dt], y=dx), row=dict_index+1, col=1)
+                # hop = len(global_t)//
+                go.Scatter(x=dt, y=dx, mode='lines', line_shape='hv', name=key), row=dict_index+1, col=1, )
+                annotations.append((key,dict_index+1))
+                # ax[dict_index].set_xticks(range(len(global_t))[::hop], global_t[::hop])
+                # plot_data += key
+                dict_index += 1
+            else:
+                for xx in range(len(dx[0])):
+                                    print(xx, type(xx))
+                                    fig.add_trace(
+                # go.Scatter(x=[reverse_lookup_dt(xx, global_t) for xx in dt], y=dx), row=dict_index+1, col=1)
+                # hop = len(global_t)//
+                go.Scatter(x=dt, y=[data[xx] for data in dx], mode='lines', line_shape='hv', name=key), row=dict_index+1, col=1, )
+                annotations.append((key,dict_index+1))
+                dict_index += 1
+
+
+        for name, row in annotations:
+            yref = 'y domain' if row == 1 else f'y{row} domain'
+            fig.add_annotation(
+            text=name,
+            xref='paper', yref=yref,
+            x=0.01, y=1.10,
+            showarrow=False,
+            font=dict(color='blue', size=14)
+        )
+
         # plt.xlabel("Time (ns)")
         # plt.show()
         # ax[-1].set_xticklabels([str(xx) for xx in global_t])
-        fig.update_layout(height=200*len(data_dict), title_text="CAVEAT- Dynamic Test Reporting")
+        fig.update_layout(height=200*(len(data_dict)+1), title_text="CAVEAT- Dynamic Test Reporting")
         plot_data += fig.to_html()
         outfilepath = '../results/dynamic/'
         outfilesubdir = os.path.split(testname)[0]
