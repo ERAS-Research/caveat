@@ -114,20 +114,25 @@ class CaveatBench():
             self.sinks[label] = AxiStreamSink(bus, clk, byte_size=byte_width)
         if monitor:
             self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
+
     async def send_message(self, sender_name, message):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
         """
         self.sources[sender_name].send_nowait(bytes(message))
 
     async def read_message(self, receiver_name):
-        """Read value out from specified receiver, returning an integer list
+        """Read value out from specified receiver, returns list of integers
         """
         receiver=self.sinks[receiver_name]
         outvalue = await receiver.read()
         return outvalue
 
     def read_message_nowait(self, receiver_name):
+<<<<<<< HEAD
         """Read value out from specified receiver, returning an integer list
+=======
+        """Read value out from specified receiver, returns list of integers
+>>>>>>> dev
         """
         return self.sinks[receiver_name].read_nowait()
 
@@ -160,7 +165,11 @@ class CaveatBench():
 
         make_report(testname, cfg_plot=cfg_plot)
 
+<<<<<<< HEAD
     async def init_monitor(self, signal_name, clk, monitor_name=None, little_endian=False):
+=======
+    async def init_monitor(self, signal_name, clk, callback= lambda x: x):
+>>>>>>> dev
         """Create and start a monitor for a specific signal
         """
 
@@ -169,6 +178,10 @@ class CaveatBench():
         if monitor_name is not None:
             signal_name=monitor_name
         self.handle_dict[signal_name] = [signal.value]
+<<<<<<< HEAD
         print("for monitor", signal_name, "little endian is", little_endian)
         self.monitor_list[signal_name] = CaveatMonitor(signal=signal, little_endian=little_endian)
+=======
+        self.monitor_list[signal_name] = CaveatMonitor(signal=signal, callback=callback)
+>>>>>>> dev
         self.monitor_list[signal_name].start()
