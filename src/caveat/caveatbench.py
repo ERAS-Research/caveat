@@ -8,7 +8,7 @@ from cocotbext.axi import AxiStreamBus, AxiStreamSource, AxiStreamSink
 from cocotb.handle import ModifiableObject
 import logging
 
-from .caveatmonitor import CaveatMonitor
+from .caveatmonitor import CaveatMonitor, CaveatAxiStreamMonitor
 from .report import make_report
 
 
@@ -22,8 +22,10 @@ class CaveatBench():
         self.dut = dut
         self.monitor_list = {}
         self.handle_dict = {}
+        self.axis_dict = {}
         self.sources = {}
         self.sinks = {}
+        self.monitors = {}
         self._config = config
 
     def get_clock_handle(self, clk):
@@ -56,7 +58,7 @@ class CaveatBench():
         self._config = dict()
 
     async def add_sender_axis(self, label: str, clk, prefix: str='',
-            signals: dict={}, verbosity_level=logging.WARNING, byte_width=8):
+            signals: dict={}, verbosity_level=logging.WARNING, byte_width=8, monitor=False):
         """Add AXI-Stream interface capable of sending data to the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
         or a dictionary of signals following the pattern
@@ -70,6 +72,7 @@ class CaveatBench():
                             "instantiate a source.")
 
         if not signals:
+            bus = AxiStreamBus.from_prefix(self.dut, prefix)
             self.sources[label] = AxiStreamSource(
                 AxiStreamBus.from_prefix(self.dut, prefix),
                 clk, byte_size=byte_width)
@@ -82,15 +85,12 @@ class CaveatBench():
                 #configure logging
                 logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
             self.sources[label] = AxiStreamSource(bus, clk, byte_size=byte_width)
+        if monitor:
+            self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
 
     async def add_receiver_axis(self, label: str, clk, prefix: str='',
-            signals: dict={}, verbosity_level=logging.WARNING, byte_width=8):
-        """Add AXI-Stream interface capable of receiving data from the DUT.
-        Takes in either a shared prefix for the prefix_t* wires in the HDL code,
-        or a dictionary of signals following the pattern
-          {"signal type": "signal_name"} i.e {"tdata": "example_tdata"}
-        If both are defined, the prefix is prepended to all signals names.
-        """
+            signals: dict={}, verbosity_level=logging.WARNING, byte_width=8, monitor=False):
+
         clk = self.get_clock_handle(clk)
 
         if (not signals) and (prefix == ''):
@@ -98,9 +98,11 @@ class CaveatBench():
                             "instantiate a sink.")
 
         if not signals:
+            bus = AxiStreamBus.from_prefix(self.dut, prefix)
             self.sinks[label] = AxiStreamSink(
                                     AxiStreamBus.from_prefix(self.dut, prefix),
                                     clk, byte_size=byte_width)
+
             #configure logging
             logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
         else:
@@ -110,7 +112,8 @@ class CaveatBench():
                 #configure logging
                 logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
             self.sinks[label] = AxiStreamSink(bus, clk, byte_size=byte_width)
-
+        if monitor:
+            self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
     async def send_message(self, sender_name, message):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
         """
@@ -148,9 +151,11 @@ class CaveatBench():
         for monitor_name, mon in self.monitor_list.items():
             self.handle_dict[monitor_name] = list(mon._values._queue)
 
+        for monitor_name, mon in self.monitors.items():
+            self.axis_dict[monitor_name] = list(mon.frame_buffer)
         cfg_plot = {}
         cfg_plot['data_dict'] = self.handle_dict
-        cfg_plot['axis_dict'] = None
+        cfg_plot['axis_dict'] = self.axis_dict
         cfg_plot['truncate'] = truncate
 
         make_report(testname, cfg_plot=cfg_plot)
