@@ -145,7 +145,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, head
                         dx[ii] = [float(xx) for xx in dx[ii]]
             #plot data
             fig = plt.figure()
-            print('DT DX', dt, dx)
             plt.step(dt, dx, where='mid')
             plt.xlabel("Time (ns)")
             plot_data += key
