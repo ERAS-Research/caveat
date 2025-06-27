@@ -8,7 +8,7 @@ module axis_adder #(
 
   input  wire [2*c_WIDTH-1:0] s_axis_tdata,
   input  wire                 s_axis_tvalid,
-  output reg                  s_axis_tready= 1,
+  output reg                  s_axis_tready = 1,
 
   output reg [2*c_WIDTH-1:0] m_axis_tdata,
   output reg                 m_axis_tvalid = 0,
