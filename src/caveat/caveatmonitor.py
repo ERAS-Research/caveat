@@ -14,7 +14,6 @@ class CaveatMonitor(Monitor):
     """CaveatMonitor inherits from cocotb_bus and defines _capture() to
     process monitored signals. Used for dedicated capturing.
     """
-
     def __init__(self, signal: SimHandleBase, callback= lambda x: x, little_endian=False):
         self._values = Queue()
         self._signal = signal

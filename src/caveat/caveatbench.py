@@ -123,7 +123,7 @@ class CaveatBench():
     async def read_message(self, receiver_name):
         """Read value out from specified receiver, returns list of integers
         """
-        receiver=self.sinks[receiver_name]
+        receiver = self.sinks[receiver_name]
         outvalue = await receiver.read()
         return outvalue
 
@@ -140,7 +140,7 @@ class CaveatBench():
         for _ in range(cycle_num):
             await RisingEdge(clk)
 
-    def generate_plot(self, truncate=False, testname: str=''):
+    def generate_plot(self, truncate=False, testname: str='', rev_lookup=lambda x: str(x)):
         """Generate visual report of signals
         """
         #collect data for plotting
@@ -160,7 +160,7 @@ class CaveatBench():
         cfg_plot['axis_dict'] = self.axis_dict
         cfg_plot['truncate'] = truncate
 
-        make_report(testname, cfg_plot=cfg_plot)
+        make_report(testname, cfg_plot=cfg_plot, rev_lookup=rev_lookup)
 
     async def init_monitor(self, signal_name, clk, name=None, little_endian=False, callback= lambda x: x):
         """Create and start a monitor for a specific signal
