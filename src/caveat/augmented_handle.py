@@ -13,8 +13,8 @@ from .interface.socket_axis import SocketAXIS
 
 def create_interface_socket_to_axis(self: cocotb.handle.SimHandleBase,
         remote_address: str, remote_port: int, local_port: int,
-        axis_bus_module_input: str = "s_axis",
-        axis_bus_module_output: str = "m_axis"):
+        axis_bus_module_input: str,
+        axis_bus_module_output: str):
     """Network socket interface for virtual/emulated gateware via AXIS
     """
     #create AXIS interface
@@ -35,8 +35,8 @@ cocotb.handle.SimHandleBase.create_interface_socket_to_axis = create_interface_s
 
 
 def create_interface_serial_to_axis(self: cocotb.handle.SimHandleBase,
-        serial_port: str, axis_bus_module_input: str = "s_axis",
-        axis_bus_module_output: str = "m_axis"):
+        serial_port: str, axis_bus_module_input: str ,
+        axis_bus_module_output: str):
     """Serial interface for virtual/emulated gateware via AXIS, e.g. for use
     with I2C, UART, and GPIB.
     """

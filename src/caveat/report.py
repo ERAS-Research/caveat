@@ -30,7 +30,7 @@ html_template = """
     """
 
 
-def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False, header_size=3):
+def get_html_plot_data(testname, data_dict=None, axis_dict=None, header_size=3):
     """Stringify plot data for HTML reporting
     """
     plot_data = "<h2>{:s}</h2>".format(testname)
