@@ -35,7 +35,7 @@ cocotb.handle.SimHandleBase.create_interface_socket_to_axis = create_interface_s
 
 
 def create_interface_serial_to_axis(self: cocotb.handle.SimHandleBase,
-     serial_port: str, axis_bus_module_input: str = "s_axis",
+        serial_port: str, axis_bus_module_input: str = "s_axis",
         axis_bus_module_output: str = "m_axis"):
     """Serial interface for virtual/emulated gateware via AXIS, e.g. for use
     with I2C, UART, and GPIB.
