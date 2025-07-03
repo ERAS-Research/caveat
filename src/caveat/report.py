@@ -29,7 +29,7 @@ html_template = """
     """
 
 
-def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False,
+def get_html_plot_data(testname, data_dict, axis_dict=None,
         header_size=3, rev_lookup=lambda x: str(x)):
     """Stringify plot data for HTML reporting
     """
@@ -43,10 +43,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False,
                 try:
                     header = rev_lookup(pkg[0][:header_size])
                 except:
-                    if pkg[0][:header_size] == [0,32,0]: ##TODO: refactor, project specific. data byte argument?
-                        header = 'DATA'
-                    else:
-                        print(pkg[0][:3])
+                        print(pkg[0][:header_size])
                         header = 'UNKNOWN'
                 df.append(dict(Task=key, Start=str(pkg[1]), Finish=str(pkg[2]), pkg_header=header))
                 # colors[header] = 'rgb({:})'.format(','.join([str(x) for x in pkg[0]])) #use to turn header into RGB color
