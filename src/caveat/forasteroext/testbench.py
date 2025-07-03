@@ -85,7 +85,7 @@ class Testbench(BaseBench):
         """
         self._config = dict()
 
-    def generate_plot(self, truncate=False, testname: str=''):
+    def generate_plot(self, testname: str=''):
         """Generate visual report of signals
         """
         #collect data for plotting
@@ -98,7 +98,6 @@ class Testbench(BaseBench):
         cfg_plot = {}
         cfg_plot['data_dict'] = self.handle_dict
         cfg_plot['axis_dict'] = None
-        cfg_plot['truncate'] = truncate
 
         make_report(testname, cfg_plot=cfg_plot)
 
