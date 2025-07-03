@@ -1,14 +1,9 @@
 # Copyright (C) 2025 ERAS Research Group
 # Author(s): Murray Ferris, Torsten Reuschel
 
-import matplotlib.pyplot as plt
-import json
-import mpld3
 import os
-import wavedrom
 from pathlib import Path
 import numpy as np
-import plotly as px
 from plotly.subplots import make_subplots
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
@@ -46,9 +41,9 @@ def get_html_plot_data(testname, data_dict, axis_dict=None, truncate=False,
         for key, pkgs in axis_dict.items():
             for pkg in pkgs:
                 try:
-                    header = rev_lookup(pkg[0][:3])
+                    header = rev_lookup(pkg[0][:header_size])
                 except:
-                    if pkg[0][:3] == [0,32,0]:
+                    if pkg[0][:header_size] == [0,32,0]: ##TODO: refactor, project specific. data byte argument?
                         header = 'DATA'
                     else:
                         print(pkg[0][:3])
