@@ -90,6 +90,12 @@ class CaveatBench():
 
     async def add_receiver_axis(self, label: str, clk, prefix: str='',
             signals: dict={}, verbosity_level=logging.WARNING, byte_width=8, monitor=False):
+        """Add AXI-Stream interface capable of receiving data from the DUT.
+        Takes in either a shared prefix for the prefix_t* wires in the HDL code,
+        or a dictionary of signals following the pattern
+          {"signal type": "signal_name"} i.e {"tdata": "example_tdata"}
+        If both are defined, the prefix is prepended to all signals names.
+        """
 
         clk = self.get_clock_handle(clk)
 
