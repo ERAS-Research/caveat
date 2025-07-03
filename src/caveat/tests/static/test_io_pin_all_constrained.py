@@ -7,8 +7,7 @@ static verification
 
 
 def test_inout_pin_all_constrained(pin_constraints, net_specification):
-    """Verify that all physical pins are constrained: starting with a list of
-    netlisted pins, verify that
+    """Verify that all physical pins are constrained. Check that
      - corresponding pin constrains exist, and
      - no excess pin constraints exist, as this suggests an incomplete netlist.
 
@@ -16,16 +15,15 @@ def test_inout_pin_all_constrained(pin_constraints, net_specification):
       pin_constraints: dict=fileio.xdc_parser.read_xdc(...)
       net_specification: dict=fileio.netlist_parser.read_netspec_from_csv(...)
     """
-    list_unchecked = list(net_specification.keys())
-    list_checked = list()
-    for pin in pin_constraints:
-        assert (pin['name'] in list_unchecked + list_checked), "constrained pin '{:s}' unconnected or missing in net specification".format(pin['name'])
+    pins_constrained = set([pin['name'] for pin in pin_constraints])
+    pins_netlisted = set(net_specification.keys())
 
-        #TODO: add detailed constraint verification here
+    excess_constrained = pins_constrained - pins_netlisted
+    assert excess_constrained == set([]), \
+        "constrained pin(s) unconnected or missing in netlist: {:}".format(
+            ' '.join(excess_constrained))
 
-        #move checked pin from 'list_unchecked' to 'list_checked'
-        if pin['name'] in list_unchecked:
-            list_unchecked.remove(pin['name'])
-            list_checked.append(pin['name'])
-
-    assert list_unchecked == [], "netlist contains unconstrained pins: {:}".format(' '.join(list_unchecked))
+    excess_netlisted = pins_netlisted - pins_constrained
+    assert excess_netlisted == set([]), \
+        "netlist contains unconstrained pins: {:}".format(
+            ' '.join(excess_netlisted))
