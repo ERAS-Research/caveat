@@ -146,7 +146,7 @@ class CaveatBench():
         for _ in range(cycle_num):
             await RisingEdge(clk)
 
-    def generate_plot(self, truncate=False, testname: str='', rev_lookup=lambda x: str(x)):
+    def generate_plot(self, testname: str='', rev_lookup=lambda x: str(x)):
         """Generate visual report of signals
         """
         #collect data for plotting
@@ -164,7 +164,6 @@ class CaveatBench():
         cfg_plot = {}
         cfg_plot['data_dict'] = self.handle_dict
         cfg_plot['axis_dict'] = self.axis_dict
-        cfg_plot['truncate'] = truncate
 
         make_report(testname, cfg_plot=cfg_plot, rev_lookup=rev_lookup)
 
