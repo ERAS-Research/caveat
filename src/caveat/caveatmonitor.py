@@ -32,7 +32,7 @@ class CaveatMonitor(Monitor):
         while True:
             await Edge(self._signal)
             try:
-                data = self._capture(self._signal.value)
+                data = self._capture(int(self._signal.value))
 
                 self._values.put_nowait(data)
             except ValueError:

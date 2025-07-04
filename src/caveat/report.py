@@ -2,17 +2,11 @@
 # Author(s): Murray Ferris, Torsten Reuschel
 
 import os
-from pathlib import Path
 import numpy as np
+from pathlib import Path
 from plotly.subplots import make_subplots
 import plotly.figure_factory as ff
 import plotly.graph_objects as go
-### FIXME: ignore deprecation warnings from mpld3 library
-# patch has been merged upstream, remove this section once released,
-# cf. https://github.com/mpld3/mpld3/issues/530
-import warnings
-warnings.filterwarnings('ignore', category=DeprecationWarning, module='mpld3')
-### FIXME-END ##
 
 html_template = """
     <!DOCTYPE html>
@@ -37,7 +31,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
 
     if axis_dict:
         df = []
-        colors = {}
         for key, pkgs in axis_dict.items():
             for pkg in pkgs:
                 try:
@@ -46,7 +39,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                         print(pkg[0][:header_size])
                         header = 'UNKNOWN'
                 df.append(dict(Task=key, Start=str(pkg[1]), Finish=str(pkg[2]), pkg_header=header))
-                # colors[header] = 'rgb({:})'.format(','.join([str(x) for x in pkg[0]])) #use to turn header into RGB color
 
         fig2 = ff.create_gantt(
                     df,
@@ -98,9 +90,8 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
         if data_dict:
             traces = []
             dict_index = 0
+            names_list = []
             for key, values in data_dict.items():
-                if not ('RF' in key):
-                    continue
                 dict_index += 1
 
                 #sanity check: skip monitors that did not record events
@@ -133,13 +124,8 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                             # cx.append( float('nan') )
                             cx.append( 0. )
                 cx = abs(np.array(cx))
-                ##FIXME: project specific
-                # print(key, [complex(a, b) for a, b in zip(*dx)])
-                if 'Tx' in key:
-                    dt = [(ddt - dt[0] + 2600) for ddt in dt] #manual delay
-                elif 'Rx' in key:
-                    dt = [(ddt - dt[0] ) for ddt in dt] #manual delay, no global-time and quiet time extraction at this time
                 traces.append(go.Scatter(x=dt, y=[.5*xval/max(cx) - dict_index-.5 for xval in cx], mode='lines', line_shape='hv', name=key))
+                names_list.append(key)
 
             Ntraces = dict_index
             #export axis+data plot
@@ -156,22 +142,14 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                         'range':[-1 - Ntraces, len(axis_dict)-.5],
                         },
                 )
-            fig3.add_annotation(
-                text='RF-Tx',
-                xref='paper',
-                # yref=-.5,
-                x=-.015, y=-1,
-                showarrow=False,
-                font=dict(color='black', size=18),)
-            fig3.add_annotation(
-                text='RF-Rx',
-                xref='paper',
-                # yref=-1.5,
-                x=-.015, y=-2,
-                showarrow=False,
-                font=dict(color='black', size=18),)
-            ##FIXME: unsure of how to uodate this. optional arg to add annotations somehow?
-
+            for xx in range(len(names_list)):
+                fig3.add_annotation(
+                    text=names_list[xx],
+                    xref='paper',
+                    # yref=-.5,
+                    x=-.015, y=-1-xx,
+                    showarrow=False,
+                    font=dict(color='black', size=18),)
             outfilepath = '../results/dynamic/'
             outfilesubdir = os.path.split(testname)[0]
             Path(os.path.join(outfilepath, outfilesubdir)).mkdir(parents=True, exist_ok=True)
