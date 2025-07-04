@@ -32,7 +32,7 @@ class CaveatMonitor(Monitor):
         while True:
             await Edge(self._signal)
             try:
-                data=self._capture(int(self._signal.value))
+                data = self._capture(self._signal.value)
 
                 self._values.put_nowait(data)
             except ValueError:
@@ -47,8 +47,6 @@ class CaveatMonitor(Monitor):
             current_time = int(get_sim_time(units='ns'))
             return (current_time, self._callback(value))
 
-        if self.little_endian == True:
-            value=int.from_bytes(int(value).to_bytes(((value.bit_length()+7)//8), byteorder='big'), byteorder='little')
         current_time = int(get_sim_time(units='ns'))
         return (current_time, self._callback(value))
 
