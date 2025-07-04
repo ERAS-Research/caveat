@@ -58,7 +58,7 @@ class CaveatBench():
         self._config = dict()
 
     async def add_sender_axis(self, label: str, clk, prefix: str='',
-            signals: dict={}, verbosity_level=logging.WARNING, byte_width=8, monitor=False):
+            signals: dict={}, verbosity_level=logging.WARNING, data_bitwidth=8, monitor=False):
         """Add AXI-Stream interface capable of sending data to the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
         or a dictionary of signals following the pattern
@@ -167,15 +167,13 @@ class CaveatBench():
 
         make_report(testname, cfg_plot=cfg_plot, rev_lookup=rev_lookup)
 
-    async def init_monitor(self, signal_name, name=None, little_endian=False, callback= lambda x: x):
+    async def init_monitor(self, signal_name, name=None, little_endian=False, callback=lambda x: x):
 
         """Create and start a monitor for a specific signal
         """
-
-
         signal = getattr(self.dut, signal_name)
         if name is not None:
-            signal_name=name
+            signal_name = name
         self.handle_dict[signal_name] = [signal.value]
         self.monitor_list[signal_name] = CaveatMonitor(signal=signal, little_endian=little_endian, callback=callback)
         self.monitor_list[signal_name].start()
