@@ -40,7 +40,7 @@ def test_loopback_throughput():
         verilog_sources = ['rtl/axis_loopback.v'],
         toplevel = "axis_loopback",
         sim_build = 'build/sim_build/',
-        timescale  = "10ns/10ns",
+        timescale  = "10ns/1ps",
         extra_env = {
             'COCOTB_ANSI_OUTPUT':'1', #colorful output to terminal
             },

@@ -1,5 +1,4 @@
 `default_nettype none
-`timescale 10ns / 1ps
 module axis_loopback #(
   parameter c_WIDTH = 8
 ) (
