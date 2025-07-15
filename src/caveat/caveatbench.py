@@ -70,21 +70,37 @@ class CaveatBench():
         if (not signals) and (prefix == ''):
             raise Exception("Neither prefix nor signals defined. Cannot "
                             "instantiate a source.")
-
-        if not signals:
-            bus = AxiStreamBus.from_prefix(self.dut, prefix)
-            self.sources[label] = AxiStreamSource(
-                AxiStreamBus.from_prefix(self.dut, prefix),
-                clk, byte_size=data_bitwidth)
-            #configure logging
-            logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
-        else:
-            bus = AxiStreamBus(self.dut)
-            for key, value in signals.items():
-                bus._add_signal(key, prefix + value)
+        try:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sources[label] = AxiStreamSource(
+                    AxiStreamBus.from_prefix(self.dut, prefix),
+                    clk, byte_size=data_bitwidth)
                 #configure logging
-                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
-            self.sources[label] = AxiStreamSource(bus, clk, byte_size=data_bitwidth)
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
+                self.sources[label] = AxiStreamSource(bus, clk, byte_size=data_bitwidth)
+        except ValueError:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sources[label] = AxiStreamSource(
+                    AxiStreamBus.from_prefix(self.dut, prefix),
+                    clk)
+                #configure logging
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
+                self.sources[label] = AxiStreamSource(bus, clk)
+
         if monitor:
             self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
 
@@ -102,22 +118,40 @@ class CaveatBench():
         if (not signals) and (prefix == ''):
             raise Exception("Neither prefix nor signals defined. Cannot "
                             "instantiate a sink.")
+        try:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sinks[label] = AxiStreamSink(
+                                        AxiStreamBus.from_prefix(self.dut, prefix),
+                                        clk, byte_size=data_bitwidth)
 
-        if not signals:
-            bus = AxiStreamBus.from_prefix(self.dut, prefix)
-            self.sinks[label] = AxiStreamSink(
-                                    AxiStreamBus.from_prefix(self.dut, prefix),
-                                    clk, byte_size=data_bitwidth)
-
-            #configure logging
-            logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
-        else:
-            bus = AxiStreamBus(self.dut)
-            for key, value in signals.items():
-                bus._add_signal(key, prefix + value)
                 #configure logging
-                logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
-            self.sinks[label] = AxiStreamSink(bus, clk, byte_size=data_bitwidth)
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
+                self.sinks[label] = AxiStreamSink(bus, clk)
+
+
+        except ValueError:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sinks[label] = AxiStreamSink(
+                                        AxiStreamBus.from_prefix(self.dut, prefix),
+                                        clk)
+
+                #configure logging
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
+                self.sinks[label] = AxiStreamSink(bus, clk)
         if monitor:
             self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
 
