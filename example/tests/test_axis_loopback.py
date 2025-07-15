@@ -14,7 +14,7 @@ from caveat.caveatbench import CaveatBench
 
 
 @cocotb.test()
-async def fifo_throughput(dut):
+async def loopback_throughput(dut):
     """Pass a random sequence of bytes through a FIFO via AXI.
     """
     #create testbench
@@ -33,7 +33,7 @@ async def fifo_throughput(dut):
     #export illustration of data transfer
     tb.generate_plot()
 
-def test_fifo_throughput():
+def test_loopback_throughput():
     """pytest wrapper to capture test results from cocotb_test runner
     """
     run(module = __name__,
