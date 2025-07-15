@@ -201,7 +201,7 @@ class CaveatBench():
 
         make_report(testname, cfg_plot=cfg_plot, rev_lookup=rev_lookup)
 
-    async def init_monitor(self, signal_name, name=None, little_endian=False, callback=lambda x: x):
+    async def init_monitor(self, signal_name, name=None, callback=lambda x: x):
 
         """Create and start a monitor for a specific signal
         """
@@ -209,5 +209,5 @@ class CaveatBench():
         if name is not None:
             signal_name = name
         self.handle_dict[signal_name] = [signal.value]
-        self.monitor_list[signal_name] = CaveatMonitor(signal=signal, little_endian=little_endian, callback=callback)
+        self.monitor_list[signal_name] = CaveatMonitor(signal=signal, callback=callback)
         self.monitor_list[signal_name].start()
