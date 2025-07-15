@@ -26,6 +26,7 @@ async def fifo_throughput(dut):
         await tb.init_monitor(signal, 'clk')
     #pass sequence
     input_sequence = [random.randint(0,255) for xx in range(100)]
+    await tb.wait("clk",1)
     await tb.send_message('input', input_sequence)
     received_sequence = await tb.read_message('output')
     assert received_sequence == input_sequence, 'Sequence not received as sent.'
