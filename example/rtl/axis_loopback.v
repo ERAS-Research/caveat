@@ -4,7 +4,6 @@ module axis_loopback #(
   parameter c_WIDTH = 8
 ) (
   input wire clk,
-  input wire rst,
 
   input  wire [c_WIDTH-1:0]   s_axis_tdata,
   input  wire                 s_axis_tvalid,
