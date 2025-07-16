@@ -23,7 +23,7 @@ async def loopback_throughput(dut):
     await tb.add_sender_axis(prefix='s_axis', label='input', clk='clk')
     await tb.add_receiver_axis(prefix='m_axis', label='output', clk='clk')
     for signal in ['s_axis_tdata', 'm_axis_tdata']:
-        await tb.init_monitor(signal, signal)
+        await tb.init_monitor(signal)
     #pass sequence
     input_sequence = [random.randint(0,255) for xx in range(100)]
     await tb.wait("clk",1)
