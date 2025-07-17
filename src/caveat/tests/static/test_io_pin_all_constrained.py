@@ -5,7 +5,6 @@
 static verification
 """
 
-
 def test_inout_pin_all_constrained(pin_constraints, net_specification):
     """Verify that all physical pins are constrained. Check that
      - corresponding pin constrains exist, and

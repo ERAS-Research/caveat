@@ -23,22 +23,11 @@ It distinguishes two distinct aspects of verification:
 
 We will provide example's on how to do this...
 
-### Repository Structure
-
-#### Issues
-
-#### Pull Requests
+### Dependencies
+(see requirements.txt)
 
 
-### Developer Notes
-
-#### Installation
-
-**Dependencies**
-
-- python 3.11+
-- pip
-- venv
+### Installation (inside virtual environment)
 ``` Bash
 sudo apt install python-venv
 ```
@@ -56,27 +45,28 @@ python3 -m pip install build
 
 **Install locally**
 
-In the caveat top level directory where `pyproject.toml` lives and in your virtual environment:
+In the caveat top level directory where `pyproject.toml` lives, run:
 ```Bash
 pip install -e .
 ```
 
-this will install `caveat` locally, to test:
-
-startup a python interpretor by typing `python3` in your command line prompt
-
-```python
-from caveat import Static as CaveatStatic
-from caveat import Dynamic as CaveatDynamic
-caveat_dynamic.config('')
-caveat_dynamic.run()
+To test the installed code, navigate to `example/` and run:
+```Bash
+./run_tests.py
 ```
-
-#### Testing Environment
-
-To run unit tests, go to the main directory of *caveat* repo and type `pytest`.
+The test *test_loopback_throughput* will execute, and the results are placed in the subdirectory `build/results/`.
 
 
 ### Recommended Tools (optional)
+- python 3.11+
+- pip
+- venv
 - **pytest-reporter-html-dots** for advanced html reporting
 - **pytest-xdist** for test parallelization (or pytest-parallel)
+
+
+### Repository Structure
+
+#### Issues
+
+#### Pull Requests

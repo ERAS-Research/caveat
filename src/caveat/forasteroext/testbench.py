@@ -14,11 +14,10 @@ from forastero.bench import BaseBench
 from forastero.io import IORole
 from forastero.monitor import MonitorEvent
 
-from .stream import StreamBackpressure, StreamMonitor, StreamInitiator, \
-                    StreamIO, StreamResponder, StreamTransaction, \
-                    StreamTransactionLast
-
-from ..report import make_report
+from caveat.forasteroext.stream import StreamBackpressure, StreamMonitor, \
+    StreamInitiator, StreamIO, StreamResponder, StreamTransaction, \
+    StreamTransactionLast
+from caveat.report import make_report
 
 
 class Testbench(BaseBench):

@@ -4,7 +4,7 @@
 import cocotb
 from cocotb.queue import Queue
 
-from .simulation import PhysicalSimulation
+from caveat.simulation import PhysicalSimulation
 
 
 class Adder(PhysicalSimulation):

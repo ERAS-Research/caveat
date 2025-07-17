@@ -8,7 +8,6 @@
 Import and parse Xilinx package descriptions
 """
 
-
 import math
 
 
@@ -31,7 +30,6 @@ def read_in_package_specification(infilename):
 
     return pinspec
 
-
 def get_voltage_bank(pinbank_db, iopin: str):
     """
     Import and parse Xilinx package descriptions as provided at
@@ -42,7 +40,6 @@ def get_voltage_bank(pinbank_db, iopin: str):
 
     return pinbank_db.get(iopin).get('Bank')
 
-
 def get_iotype(pinbank_db, iopin: str):
     """
     Import and parse Xilinx package descriptions as provided at
@@ -52,7 +49,6 @@ def get_iotype(pinbank_db, iopin: str):
         "Unknown pin: {:s}".format(iopin)
 
     return pinbank_db.get(iopin).get('I/OType')
-
 
 def get_pin_voltage_max_from_iostandard(iostandard: str):
     """Map I/O standard to nominal peak voltage
@@ -70,7 +66,6 @@ def get_pin_voltage_max_from_iostandard(iostandard: str):
         }
     return iostandard_db.get(iostandard, math.nan)
 
-
 def get_io_voltage_max_from_iotype_7series(iotype: str):
     """Information according to 7 Series FPGAs SelectIO Resources User Guide
     (UG471), Table 1-1
@@ -80,7 +75,6 @@ def get_io_voltage_max_from_iotype_7series(iotype: str):
         'HP': 1.8,
         }
     return iotype_db.get(iotype, math.nan)
-
 
 def get_pin_current_max_7series(iostandard: str, iotype: str):
     """Information according to 7 Series FPGAs SelectIO Resources User Guide
