@@ -5,13 +5,8 @@
 
 import cocotb
 from cocotb_test.run import run
-import os
 import random
-import sys
 
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/'))
-if module_path not in sys.path:
-    sys.path.append(module_path)
 from caveat.caveatbench import CaveatBench
 
 
