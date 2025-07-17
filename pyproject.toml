@@ -4,9 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "caveat"
-version = "0.1_dev"
+version = "0.1"
 authors = [
   { name="Torsten Reuschel", email="torsten.reuschel@unb.ca" },
+  { name="Murray Ferris", email="murray.ferris2@unb.ca" },
 ]
 description = "Context-Aware Verification, Emulation, and Training"
 readme = "README.md"

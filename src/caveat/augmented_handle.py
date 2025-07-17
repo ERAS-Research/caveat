@@ -17,13 +17,21 @@ def create_interface_socket_to_axis(self: cocotb.handle.SimHandleBase,
         axis_bus_module_output: str = "m_axis"):
     """Network socket interface for virtual/emulated gateware via AXIS
     """
-    #create AXIS interface
-    axis_sink = AxiStreamSink(
-        AxiStreamBus.from_prefix(self, axis_bus_module_output),
-        self.clk, self.rst)
-    axis_source = AxiStreamSource(
-        AxiStreamBus.from_prefix(self, axis_bus_module_input),
-        self.clk, self.rst)
+    #create AXIS interface (with or without reset wire)
+    if 'rst' in dir(self):
+        axis_sink = AxiStreamSink(
+            AxiStreamBus.from_prefix(self, axis_bus_module_output),
+            self.clk, self.rst)
+        axis_source = AxiStreamSource(
+            AxiStreamBus.from_prefix(self, axis_bus_module_input),
+            self.clk, self.rst)
+    else:
+        axis_sink = AxiStreamSink(
+            AxiStreamBus.from_prefix(self, axis_bus_module_output),
+            self.clk)
+        axis_source = AxiStreamSource(
+            AxiStreamBus.from_prefix(self, axis_bus_module_input),
+            self.clk)
     #create, connect, and open socket
     self._if_socket_handle = SocketAXIS(
         remote_address=remote_address,
