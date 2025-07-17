@@ -21,7 +21,7 @@ It distinguishes two distinct aspects of verification:
 1. static (topologic), and
 2. dynamic (algorithmic).
 
-For basic examples on how to do this, please see [slides presented at FPGA Conference Europe 2025](doc/20250702_fpgaconf2025_caveat-compressed.pdf).
+For basic examples on how to do this, please see [slides presented at FPGA Conference Europe 2025](doc/20250702_fpgaconf2025_caveat-public-compressed.pdf).
 
 ### Dependencies
 (see requirements.txt)
