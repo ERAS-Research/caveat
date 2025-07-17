@@ -45,7 +45,7 @@ class SequenceChecker():
                     parser_name,
                     command_string))
             parser(self, command)
-            except Exception e:
+            except Exception as e:
                 self.log("Error in {:s}: {:s}".format(
                     parser_name,
                     str(e)))
