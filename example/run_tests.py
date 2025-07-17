@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (C) 2025 ERAS Research Group and sanimut Development Team
 # Author(s): Murray Ferris, Torsten Reuschel
 
@@ -8,7 +10,7 @@ import pytest
 def pytest_reporter_context(context):
     """Customize pytest report
     """
-    context["title"] = "CAVEAT example: AXIS-FIFO"
+    context["title"] = "CAVEAT example tests"
 
 
 if __name__ == '__main__':

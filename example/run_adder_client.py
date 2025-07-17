@@ -18,7 +18,8 @@ sock = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
 sock.bind(('', local_port))
 sock.settimeout(0)
 
-print("User interface for 'adder over network' example. Enter two integers and press enter to add. Send 255 255 to shut down.")
+print("User interface for 'adder over network' example. Enter two integers " \
+      "and press enter to add. Send 255 255 to shut down.")
 while True:
     req = input('Enter two integers to add: ')
     req = req.strip().split()

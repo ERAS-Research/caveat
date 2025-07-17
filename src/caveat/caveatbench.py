@@ -58,7 +58,7 @@ class CaveatBench():
         self._config = dict()
 
     async def add_sender_axis(self, label: str, clk, prefix: str='',
-            signals: dict={}, verbosity_level=logging.WARNING, monitor=False):
+            signals: dict={}, verbosity_level=logging.WARNING, data_bitwidth=8, monitor=False):
         """Add AXI-Stream interface capable of sending data to the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
         or a dictionary of signals following the pattern
@@ -70,68 +70,105 @@ class CaveatBench():
         if (not signals) and (prefix == ''):
             raise Exception("Neither prefix nor signals defined. Cannot "
                             "instantiate a source.")
-
-        if not signals:
-            bus = AxiStreamBus.from_prefix(self.dut, prefix)
-            self.sources[label] = AxiStreamSource(
-                bus,
-                clk)
-            #configure logging
-            logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
-        else:
-            bus = AxiStreamBus(self.dut)
-            for key, value in signals.items():
-                bus._add_signal(key, prefix + value)
+        try:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sources[label] = AxiStreamSource(
+                    AxiStreamBus.from_prefix(self.dut, prefix),
+                    clk, byte_size=data_bitwidth)
                 #configure logging
-                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
-            self.sources[label] = AxiStreamSource(bus, clk)
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
+                self.sources[label] = AxiStreamSource(bus, clk, byte_size=data_bitwidth)
+        except ValueError:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sources[label] = AxiStreamSource(
+                    AxiStreamBus.from_prefix(self.dut, prefix),
+                    clk)
+                #configure logging
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix + value)).setLevel(verbosity_level)
+                self.sources[label] = AxiStreamSource(bus, clk)
+
         if monitor:
             self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
 
     async def add_receiver_axis(self, label: str, clk, prefix: str='',
-            signals: dict={}, verbosity_level=logging.WARNING, monitor=False):
+            signals: dict={}, verbosity_level=logging.WARNING, data_bitwidth=8, monitor=False):
         """Add AXI-Stream interface capable of receiving data from the DUT.
         Takes in either a shared prefix for the prefix_t* wires in the HDL code,
         or a dictionary of signals following the pattern
           {"signal type": "signal_name"} i.e {"tdata": "example_tdata"}
         If both are defined, the prefix is prepended to all signals names.
         """
+
         clk = self.get_clock_handle(clk)
 
         if (not signals) and (prefix == ''):
             raise Exception("Neither prefix nor signals defined. Cannot "
                             "instantiate a sink.")
+        try:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sinks[label] = AxiStreamSink(
+                                        AxiStreamBus.from_prefix(self.dut, prefix),
+                                        clk, byte_size=data_bitwidth)
 
-        if not signals:
-            bus = AxiStreamBus.from_prefix(self.dut, prefix)
-            self.sinks[label] = AxiStreamSink(
-                                    bus,
-                                    clk)
-            #configure logging
-            logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
-        else:
-            bus = AxiStreamBus(self.dut)
-            for key, value in signals.items():
-                bus._add_signal(key, prefix + value)
                 #configure logging
-                logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
-            self.sinks[label] = AxiStreamSink(bus, clk)
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
+                self.sinks[label] = AxiStreamSink(bus, clk)
+
+
+        except ValueError:
+            if not signals:
+                bus = AxiStreamBus.from_prefix(self.dut, prefix)
+                self.sinks[label] = AxiStreamSink(
+                                        AxiStreamBus.from_prefix(self.dut, prefix),
+                                        clk)
+
+                #configure logging
+                logging.getLogger('cocotb.{:s}.{:s}'.format(str(self.dut), prefix)).setLevel(verbosity_level)
+            else:
+                bus = AxiStreamBus(self.dut)
+                for key, value in signals.items():
+                    bus._add_signal(key, prefix + value)
+                    #configure logging
+                    logging.getLogger('cocotb.{:s}.{:s}'.format(str(bus), prefix + value)).setLevel(verbosity_level)
+                self.sinks[label] = AxiStreamSink(bus, clk)
         if monitor:
             self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
 
     async def send_message(self, sender_name, message):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
         """
-        self.sources[sender_name].send_nowait(bytes(message))
+        self.sources[sender_name].send_nowait(list(message))
 
     async def read_message(self, receiver_name):
         """Read value out from specified receiver, returns list of integers
         """
-        receiver=self.sinks[receiver_name]
+        receiver = self.sinks[receiver_name]
         outvalue = await receiver.read()
         return outvalue
 
     def read_message_nowait(self, receiver_name):
+
         """Read value out from specified receiver, returns list of integers
         """
         return self.sinks[receiver_name].read_nowait()
@@ -143,7 +180,7 @@ class CaveatBench():
         for _ in range(cycle_num):
             await RisingEdge(clk)
 
-    def generate_plot(self, truncate=False, testname: str=''):
+    def generate_plot(self, testname: str='', rev_lookup=lambda x: str(x)):
         """Generate visual report of signals
         """
         #collect data for plotting
@@ -161,14 +198,16 @@ class CaveatBench():
         cfg_plot = {}
         cfg_plot['data_dict'] = self.handle_dict
         cfg_plot['axis_dict'] = self.axis_dict
-        cfg_plot['truncate'] = truncate
 
-        make_report(testname, cfg_plot=cfg_plot)
+        make_report(testname, cfg_plot=cfg_plot, rev_lookup=rev_lookup)
 
-    async def init_monitor(self, signal_name, callback= lambda x: x):
+    async def init_monitor(self, signal_name, name=None, callback=lambda x: x):
+
         """Create and start a monitor for a specific signal
         """
         signal = getattr(self.dut, signal_name)
+        if name is not None:
+            signal_name = name
         self.handle_dict[signal_name] = [signal.value]
         self.monitor_list[signal_name] = CaveatMonitor(signal=signal, callback=callback)
         self.monitor_list[signal_name].start()
