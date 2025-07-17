@@ -5,7 +5,6 @@
 Parse verilog code
 """
 
-
 def read_portmode(infilename: str):
     """Rudimentary extraction of module port names and port mode
 

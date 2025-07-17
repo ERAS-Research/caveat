@@ -14,11 +14,10 @@ from forastero.bench import BaseBench
 from forastero.io import IORole
 from forastero.monitor import MonitorEvent
 
-from .stream import StreamBackpressure, StreamMonitor, StreamInitiator, \
-                    StreamIO, StreamResponder, StreamTransaction, \
-                    StreamTransactionLast
-
-from ..report import make_report
+from caveat.forasteroext.stream import StreamBackpressure, StreamMonitor, \
+    StreamInitiator, StreamIO, StreamResponder, StreamTransaction, \
+    StreamTransactionLast
+from caveat.report import make_report
 
 
 class Testbench(BaseBench):
@@ -39,23 +38,23 @@ class Testbench(BaseBench):
         self.handle_dict = {}
         self.handle_dict["eth_out_mon"] = []
 
-        self.eth_instream = StreamIO(dut, "rx_fifo_agent_payload_axis",
+        self.eth_instream = cfs.StreamIO(dut, "rx_fifo_agent_payload_axis",
             IORole.RESPONDER, io_style=io_prefix_style)
-        self.eth_outstream = StreamIO(dut,"tx_fifo_agent_payload_axis",
+        self.eth_outstream = cfs.StreamIO(dut,"tx_fifo_agent_payload_axis",
             IORole.INITIATOR, io_style=io_prefix_style)
         # Register drivers and monitors for the stream interfaces
         self.register("eth_in",
-            StreamInitiator(self, self.eth_instream, self.clk, self.rst))
+            cfs.StreamInitiator(self, self.eth_instream, self.clk, self.rst))
         self.register("eth_out",
-            StreamResponder(self, self.eth_outstream, self.clk, self.rst, blocking=False))
+            cfs.StreamResponder(self, self.eth_outstream, self.clk, self.rst, blocking=False))
         self.register("eth_out_mon",
-            StreamMonitor(self, self.eth_outstream, self.clk, self.rst))
+            cfs.StreamMonitor(self, self.eth_outstream, self.clk, self.rst))
         self.eth_out_mon.subscribe(MonitorEvent.CAPTURE, self.stream_capture)
         # disable backpressure for downstream data
-        self.eth_out.enqueue(StreamBackpressure(ready=True))
+        self.eth_out.enqueue(cfs.StreamBackpressure(ready=True))
 
-    async def stream_capture(self, monitor: StreamMonitor, event: MonitorEvent,
-            obj: StreamTransaction):
+    async def stream_capture(self, monitor: cfs.StreamMonitor, event: MonitorEvent,
+            obj: cfs.StreamTransaction):
         """Process data that was captured by monitor
         """
         self.handle_dict[monitor.name].append((obj.timestamp, obj.data))
@@ -64,14 +63,14 @@ class Testbench(BaseBench):
         """Pass data to interface
         """
         for datum in data[:-1]:
-            self.eth_in.enqueue(StreamTransaction(data=datum))
-        self.eth_in.enqueue(StreamTransactionLast(data=data[-1]))
+            self.eth_in.enqueue(cfs.StreamTransaction(data=datum))
+        self.eth_in.enqueue(cfs.StreamTransactionLast(data=data[-1]))
 
     def reference_stream_append(self, monitor_name, data):
         """Append data/transactions to specified reference stream (scoreboard)
         """
         for item in data:
-           obj = StreamTransaction()
+           obj = cfs.StreamTransaction()
            obj.data = item
            self.scoreboard.channels[monitor_name].push_reference(obj)
 
@@ -104,7 +103,7 @@ class Testbench(BaseBench):
         cfg_plot['data_dict'] = self.handle_dict
         cfg_plot['axis_dict'] = None
 
-        make_report(testname, cfg_plot=cfg_plot)
+        cr.make_report(testname, cfg_plot=cfg_plot)
 
 
 def io_prefix_style(bus: str|None, component: str,
