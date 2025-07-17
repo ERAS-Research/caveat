@@ -38,7 +38,11 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                 except:
                         print(pkg[0][:header_size])
                         header = 'UNKNOWN'
-                df.append(dict(Task=key, Start=str(pkg[1]), Finish=str(pkg[2]), pkg_header=header))
+                df.append(dict(
+                            Task=key,
+                            Start=str(pkg[1]),
+                            Finish=str(pkg[2]),
+                            pkg_header=header))
 
         fig2 = ff.create_gantt(
                     df,
@@ -47,13 +51,12 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                     group_tasks=True,
                     bar_width=.3,)
         fig2.update_layout(
-            # autosize=True,
             paper_bgcolor='white',
             plot_bgcolor='white',
             font=dict(size=18, color='black'),
             yaxis={
                 'showgrid': False,
-                'range':[-.5,len(axis_dict)-.5],
+                'range':[-0.5, len(axis_dict) - 0.5],
                 },
             xaxis={
                 'gridcolor':'lightgray',
@@ -67,24 +70,20 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                 'linecolor':'black',
                 'mirror':True,}
             )
-        # fig2.update_layout(height=200*(len(axis_dict)+1), title_text="CAVEAT- Dynamic Test Reporting")
         fig2.update_layout(
             height=150*(len(axis_dict)),
             width=3000,
-            # title_text="CAVEAT- Dynamic Test Reporting"
-            title_text=None
-            )
+            title_text=None)
 
         outfilepath = '../results/dynamic/'
         outfilesubdir = os.path.split(testname)[0]
         Path(os.path.join(outfilepath, outfilesubdir)).mkdir(parents=True, exist_ok=True)
         fig2.write_image(
-            outfilepath+testname+"_v2.pdf",
+            outfilepath + testname + "_v2.pdf", #FIXME: do we still need this? merge with output _v3.pdf below?
             height=150*(len(axis_dict)),
             width=3000,)
 
         plot_data += fig2.to_html()
-
 
         ##--- joined plotting of AXIS and custom busses -------
         if data_dict:
@@ -154,12 +153,10 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
             outfilesubdir = os.path.split(testname)[0]
             Path(os.path.join(outfilepath, outfilesubdir)).mkdir(parents=True, exist_ok=True)
             fig3.write_image(
-                outfilepath+testname+"_v3.pdf",
+                outfilepath+testname+"_v3.pdf", #FIXME: do we still need this? merge with output _v2.pdf above?
                 height=100*(len(axis_dict) + Ntraces),
                 width=4000,)
             plot_data += fig3.to_html()
-
-
 
     if data_dict:
         fig= make_subplots(rows=len(data_dict), cols=1, shared_xaxes=True)
@@ -179,7 +176,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
         global_t = [elem for partlist in global_t for elem in partlist]
         #extract unique samples
         global_t = sorted(np.unique(global_t))
-
 
         for key, data in data_dict.items():
             #sanity check: skip monitors that did not record events
@@ -201,15 +197,28 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
             #plot data
             if not any(isinstance(item, list) for item in dx):
                 fig.add_trace(
-                go.Scatter(x=dt, y=dx, mode='lines', line_shape='hv', name=key), row=dict_index+1, col=1, )
+                    go.Scatter(
+                        x=dt,
+                        y=dx,
+                        mode='lines',
+                        line_shape='hv',
+                        name=key),
+                    row=dict_index+1,
+                    col=1,)
                 annotations.append((key,dict_index+1))
                 dict_index += 1
             else:
                 for xx in range(len(dx[0])):
-                                    # print(xx, type(xx))
-                                    fig.add_trace(
-                go.Scatter(x=dt, y=[data[xx] for data in dx], mode='lines', line_shape='hv', name=key), row=dict_index+1, col=1, )
-                annotations.append((key,dict_index+1))
+                    fig.add_trace(
+                        go.Scatter(
+                            x=dt,
+                            y=[data[xx] for data in dx],
+                            mode='lines',
+                            line_shape='hv',
+                            name=key),
+                        row=dict_index+1,
+                        col=1)
+                        annotations.append((key,dict_index+1))
                 dict_index += 1
 
         for name, row in annotations:
@@ -229,7 +238,6 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
         fig.write_image(outfilepath+testname+".pdf")
         return plot_data
 
-
 def make_report(testname: str, cfg_plot: dict,
         report_title: str='CAVEAT signal capture',
         outfilepath: str='../results/dynamic/', rev_lookup=lambda x: str(x)):
@@ -248,23 +256,24 @@ def make_report(testname: str, cfg_plot: dict,
     with open('{:s}/{:s}.html'.format(outfilepath, testname), 'w') as f:
         f.write(html_report)
 
-        # data_raw_dt = [[1,2,3,5],[100,101,106],[5000,5010,5011],range(10000,10010)]
-
 def active_interval(data_in, max_skip=10):
-            #flatten list
-            data = [elem for partlist in data_in for elem in partlist]
-            #extract unique samples
-            data = sorted(np.unique(data))
-            #find distinct intervals
-            out = []
-            out+= [data[0], data[1]]
-            for elem in data[2:]:
-                if elem <= out[-1] + max_skip:
-                    out[-1] = elem
-                else:
-                    out+=[elem, elem]
-            return list(zip(out[::2], out[1::2]))
+    """FIXME: missing description
+    """
+    #flatten list
+    data = [elem for partlist in data_in for elem in partlist]
+    #extract unique samples
+    data = sorted(np.unique(data))
+    #find distinct intervals
+    out = []
+    out+= [data[0], data[1]]
+    for elem in data[2:]:
+        if elem <= out[-1] + max_skip:
+            out[-1] = elem
+        else:
+            out+=[elem, elem]
+    return list(zip(out[::2], out[1::2]))
 
-# print( active_interval(data_raw_dt) )
 def reverse_lookup_dt(dt, global_t):
+    """FIXME: missing description
+    """
     return np.where(np.array(global_t)==dt)[0][0]
