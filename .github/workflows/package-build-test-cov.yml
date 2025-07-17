@@ -42,6 +42,7 @@ jobs:
         python -m pip install -e .
     - name: Test with pytest
       run: |
+        cd example/
+        pytest
         pytest --cov
-        pytest --cov example/
 
