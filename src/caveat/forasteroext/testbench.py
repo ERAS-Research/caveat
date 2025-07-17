@@ -14,7 +14,9 @@ from forastero.bench import BaseBench
 from forastero.io import IORole
 from forastero.monitor import MonitorEvent
 
-from .stream import StreamBackpressure, StreamMonitor, StreamInitiator, StreamIO, StreamResponder, StreamTransaction, StreamTransactionLast
+from .stream import StreamBackpressure, StreamMonitor, StreamInitiator, \
+                    StreamIO, StreamResponder, StreamTransaction, \
+                    StreamTransactionLast
 
 from ..report import make_report
 
@@ -42,9 +44,12 @@ class Testbench(BaseBench):
         self.eth_outstream = StreamIO(dut,"tx_fifo_agent_payload_axis",
             IORole.INITIATOR, io_style=io_prefix_style)
         # Register drivers and monitors for the stream interfaces
-        self.register("eth_in", StreamInitiator(self, self.eth_instream, self.clk, self.rst))
-        self.register("eth_out", StreamResponder(self, self.eth_outstream, self.clk, self.rst, blocking=False))
-        self.register("eth_out_mon", StreamMonitor(self, self.eth_outstream, self.clk, self.rst))
+        self.register("eth_in",
+            StreamInitiator(self, self.eth_instream, self.clk, self.rst))
+        self.register("eth_out",
+            StreamResponder(self, self.eth_outstream, self.clk, self.rst, blocking=False))
+        self.register("eth_out_mon",
+            StreamMonitor(self, self.eth_outstream, self.clk, self.rst))
         self.eth_out_mon.subscribe(MonitorEvent.CAPTURE, self.stream_capture)
         # disable backpressure for downstream data
         self.eth_out.enqueue(StreamBackpressure(ready=True))
@@ -85,7 +90,7 @@ class Testbench(BaseBench):
         """
         self._config = dict()
 
-    def generate_plot(self, truncate=False, testname: str=''):
+    def generate_plot(self, testname: str=''):
         """Generate visual report of signals
         """
         #collect data for plotting
@@ -98,7 +103,6 @@ class Testbench(BaseBench):
         cfg_plot = {}
         cfg_plot['data_dict'] = self.handle_dict
         cfg_plot['axis_dict'] = None
-        cfg_plot['truncate'] = truncate
 
         make_report(testname, cfg_plot=cfg_plot)
 

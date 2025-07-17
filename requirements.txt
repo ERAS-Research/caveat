@@ -4,8 +4,7 @@ cocotbext-axi==0.1.24
 forastero>=1.2.1
 git
 matplotlib
-mpld3
 numpy
+plotly
 pytest>=7.3.1
-wavedrom>=2.0.3.post3
-
+kaleido>=1.0.0
