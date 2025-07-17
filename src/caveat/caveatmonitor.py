@@ -31,8 +31,10 @@ class CaveatMonitor(Monitor):
         while True:
             await Edge(self._signal)
             try:
-                self._values.put_nowait(self._capture(str(int(self._signal.value))))
-            except:
+                data = self._capture(int(self._signal.value))
+
+                self._values.put_nowait(data)
+            except ValueError:
                 self._values.put_nowait(self._capture(str(self._signal.value)))
 
     def _capture(self, value):
@@ -40,6 +42,10 @@ class CaveatMonitor(Monitor):
         the most recent  value of the signal up until the current time step, and
         then appends the new value.
         """
+        if isinstance(value,str):
+            current_time = int(get_sim_time(units='ns'))
+            return (current_time, self._callback(value))
+
         current_time = int(get_sim_time(units='ns'))
         return (current_time, self._callback(value))
 
