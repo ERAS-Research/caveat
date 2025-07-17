@@ -21,7 +21,7 @@ It distinguishes two distinct aspects of verification:
 1. static (topologic), and
 2. dynamic (algorithmic).
 
-We will provide example's on how to do this...
+For basic examples on how to do this, please see [slides presented at FPGA Conference Europe 2025](doc/20250702_fpgaconf2025_caveat-compressed.pdf).
 
 ### Dependencies
 (see requirements.txt)
@@ -63,10 +63,3 @@ The test *test_loopback_throughput* will execute, and the results are placed in 
 - venv
 - **pytest-reporter-html-dots** for advanced html reporting
 - **pytest-xdist** for test parallelization (or pytest-parallel)
-
-
-### Repository Structure
-
-#### Issues
-
-#### Pull Requests
