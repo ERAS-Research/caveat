@@ -47,12 +47,15 @@ class SocketAXIS():
             raise RuntimeError('Socket already in use')
 
         #initialize communication
-        self.socket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.socket = socket.socket(
+                                family=socket.AF_INET,
+                                type=socket.SOCK_DGRAM)
         self.socket.bind(('', self.local_port))
 
         #thread for forwarding packets between interfaces
-        self.threads['comms'] = threading.Thread(target=self.communication_operation,
-                                                      args=())
+        self.threads['comms'] = threading.Thread(
+                                            target=self.communication_operation,
+                                            args=())
         self.threads['comms'].start()
 
     def communication_stop(self):
@@ -92,6 +95,8 @@ class SocketAXIS():
                 if message:
                     if self.verbose:
                         print('DEV>SOCK', list(message), flush=True)
-                    self.socket.sendto(bytearray(message), (self.remote_address, self.remote_port))
+                    self.socket.sendto(
+                                    bytearray(message),
+                                    (self.remote_address, self.remote_port))
             except cocotb.queue.QueueEmpty:
                 pass
