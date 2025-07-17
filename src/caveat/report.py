@@ -134,7 +134,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
             fig3.update_layout(
                     height=100*(len(axis_dict) + Ntraces),
                     width=4000,
-                    # title_text="CAVEAT- Dynamic Test Reporting"
+                    # title_text="CAVEAT dynamic test"
                     title_text=None,
                     yaxis={
                         'showgrid': False,
@@ -218,7 +218,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                             name=key),
                         row=dict_index+1,
                         col=1)
-                    annotations.append((key,dict_index+1))
+                    annotations.append((key, dict_index+1))
                 dict_index += 1
 
         for name, row in annotations:
@@ -230,7 +230,9 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                 showarrow=False,
                 font=dict(color='black', size=14),
             )
-        fig.update_layout(height=200*(len(data_dict)+1), title_text="CAVEAT- Dynamic Test Reporting")
+        fig.update_layout(
+            height=200*(len(data_dict)+1),
+            title_text="CAVEAT dynamic test")
         plot_data += fig.to_html()
         outfilepath = '../results/dynamic/'
         outfilesubdir = os.path.split(testname)[0]
