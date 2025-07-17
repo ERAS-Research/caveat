@@ -218,7 +218,7 @@ def get_html_plot_data(testname, data_dict, axis_dict=None,
                             name=key),
                         row=dict_index+1,
                         col=1)
-                        annotations.append((key,dict_index+1))
+                    annotations.append((key,dict_index+1))
                 dict_index += 1
 
         for name, row in annotations:
