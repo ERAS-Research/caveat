@@ -5,12 +5,8 @@
 static verification
 """
 
-
 import math
-import os
-import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))  #FIXME: refactor module import
 from caveat.fileio import xilinx_package_spec
 
 

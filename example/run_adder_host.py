@@ -7,16 +7,11 @@
 Example: network-interfaced emulation of an adder
 """
 
-import os
 import cocotb
-import sys
 from cocotb.clock import Clock
 from cocotb.triggers import RisingEdge
 from cocotb_test.simulator import run
 
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/'))
-if module_path not in sys.path:
-    sys.path.append(module_path)
 from caveat import augmented_handle
 from caveat.caveatbench import CaveatBench
 
