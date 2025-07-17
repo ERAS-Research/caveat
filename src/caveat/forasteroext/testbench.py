@@ -103,7 +103,7 @@ class Testbench(BaseBench):
         cfg_plot['data_dict'] = self.handle_dict
         cfg_plot['axis_dict'] = None
 
-        cr.make_report(testname, cfg_plot=cfg_plot)
+        make_report(testname, cfg_plot=cfg_plot)
 
 
 def io_prefix_style(bus: str|None, component: str,
