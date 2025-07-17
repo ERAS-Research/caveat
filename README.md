@@ -62,19 +62,15 @@ pip install -e .
 ```
 
 this will install `caveat` locally, to test:
-
-startup a python interpretor by typing `python3` in your command line prompt
-
-```python
-from caveat import Static as CaveatStatic
-from caveat import Dynamic as CaveatDynamic
-caveat_dynamic.config('')
-caveat_dynamic.run()
+navigate to `example/` and in your virtual environment run:
+```Bash
+./run_tests.py
 ```
+test_loopback_throughput will execute, and the results may be viewed in the `build/results/` folder .
 
 #### Testing Environment
 
-To run unit tests, go to the main directory of *caveat* repo and type `pytest`.
+To run unit tests, go to the example directory of *caveat* repo and type `pytest`, or `./run_tests.py`. for now, only test_loopback_throughput exists, but more tests will be added over time.
 
 
 ### Recommended Tools (optional)
