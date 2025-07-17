@@ -34,7 +34,7 @@ def get_git_revision() -> dict:
         timestamp = "{:%H%M%S}00".format(dt)
         gitcommit = repo.head.object.hexsha[0:7]
         is_dirty = '1' if repo.is_dirty() else '0'
-    except e:
+    except:
         datestamp = '00000000'
         timestamp = '00000000'
         gitcommit = 'fffffff'
