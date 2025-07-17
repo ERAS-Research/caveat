@@ -16,3 +16,5 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
+[tool.hatch.build.targets.wheel]
+packages = ["src/caveat"]
