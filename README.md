@@ -50,8 +50,9 @@ In the caveat top level directory where `pyproject.toml` lives, run:
 pip install -e .
 ```
 
-To test the installed code, navigate to `example/` and run:
+To test the installed code, run:
 ```Bash
+cd example
 ./run_tests.py
 ```
 The test *test_loopback_throughput* will execute, and the results are placed in the subdirectory `build/results/`.
