@@ -4,7 +4,7 @@
 import cocotb
 from cocotb.queue import Queue
 
-from caveat.simulation import PhysicalSimulation
+from .simulation import PhysicalSimulation
 
 
 class Loopback(PhysicalSimulation):

@@ -5,7 +5,7 @@ import cocotb
 from cocotb.queue import Queue
 import math
 
-from caveat.simulation import PhysicalSimulation
+from .simulation import PhysicalSimulation
 
 
 class Attenuator(PhysicalSimulation):
