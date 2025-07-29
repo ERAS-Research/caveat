@@ -154,10 +154,14 @@ class CaveatBench():
         if monitor:
             self.monitors[label] = CaveatAxiStreamMonitor(bus, clk)
 
-    async def send_message(self, sender_name, message):
+    async def send_message(self, sender_name, message, force_wait=False):
         """Send an integer, a list of integers, a byte, or a bytearray to DUT.
         """
-        self.sources[sender_name].send_nowait(list(message))
+        if force_wait:
+            await self.sources[sender_name].send(list(message))
+            await self.sources[sender_name].wait()
+        else:
+            self.sources[sender_name].send_nowait(list(message))
 
     async def read_message(self, receiver_name):
         """Read value out from specified receiver, returns list of integers
